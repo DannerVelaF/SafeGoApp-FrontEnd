@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, TouchableOpacity } from "react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router"; // Importamos useRouter para la navegación
+import { useUserStore } from "../store/store";
 
 const icon = require("../assets/safegoIcon.png");
 const light = require("../assets/Idea.png");
@@ -31,6 +32,8 @@ export default function Panel({ isOpen, togglePanel }) {
     router.push(route); // Navega a la ruta seleccionada usando Expo Router
   };
 
+  const { clearUser, userData } = useUserStore();
+  const { user } = userData;
   return (
     <View style={[styles.container, isOpen ? styles.containerOpen : null]}>
       <View
@@ -45,6 +48,16 @@ export default function Panel({ isOpen, togglePanel }) {
         <Image source={icon} style={styles.icon} />
         <Text style={{ fontSize: 32, marginLeft: 10 }}>SafeGo </Text>
       </View>
+      <Text
+        style={{
+          textAlign: "center",
+          fontSize: 20,
+          marginTop: 24,
+          fontWeight: "bold",
+        }}
+      >
+        Bienvenido {user.lastName}
+      </Text>
       <View
         style={{
           gap: 10,
@@ -141,7 +154,15 @@ export default function Panel({ isOpen, togglePanel }) {
           marginHorizontal: "auto",
         }}
       >
-        <Button title="Cerrar sesión" color={"red"} style={styles.button} />
+        <Button
+          title="Cerrar sesión"
+          color={"red"}
+          style={styles.button}
+          onPress={() => {
+            clearUser();
+            router.push("/loginScreen");
+          }}
+        />
       </View>
       <View
         style={{

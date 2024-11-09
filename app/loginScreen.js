@@ -12,11 +12,39 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { useRouter } from "expo-router"; // Importa el hook useRouter
+import api from "../service/api";
+import { useUserStore } from "../store/store";
 
 export default function LoginScreen() {
   const [isChecked, setChecked] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false); // Estado para alternar visibilidad de la contraseña
   const router = useRouter();
+
+  const [data, setData] = useState({
+    username: "",
+    password: "",
+  });
+
+  const { setUser, userData } = useUserStore();
+
+  const handleSubmit = async () => {
+    if (!data.username || !data.password) {
+      alert("Por favor, complete todos los campos.");
+      return;
+    }
+
+    try {
+      const response = await api.loginUser(data);
+      alert("Inicio de sesión exitoso");
+      setUser(response);
+      router.push("/home");
+    } catch (error) {
+      console.error("Error al iniciar sesión:");
+      alert(
+        "Error al iniciar sesión: " + (error.response?.data || error.message)
+      );
+    }
+  };
 
   return (
     <ImageBackground
@@ -36,7 +64,13 @@ export default function LoginScreen() {
               color="#666"
               style={styles.icon}
             />
-            <TextInput style={styles.input} placeholder="Usuario" />
+            <TextInput
+              style={styles.input}
+              placeholder="Usuario"
+              onChangeText={(text) =>
+                setData((prevData) => ({ ...prevData, username: text }))
+              }
+            />
           </View>
           <View style={styles.inputGroup}>
             <FontAwesome
@@ -49,6 +83,9 @@ export default function LoginScreen() {
               style={styles.input}
               placeholder="Password"
               secureTextEntry={!passwordVisible} // Cambia el estado según `passwordVisible`
+              onChangeText={(text) =>
+                setData((prevData) => ({ ...prevData, password: text }))
+              }
             />
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
@@ -77,13 +114,19 @@ export default function LoginScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              router.push("/home");
-            }}
-          >
+          <TouchableOpacity onPress={() => router.push("/registerScreen")}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "bold",
+                borderBottomColor: "#000",
+                borderBottomWidth: 1,
+              }}
+            >
+              No estas registrado? Registrate aqui!
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={styles.buttonText}>Siguiente</Text>
           </TouchableOpacity>
         </View>

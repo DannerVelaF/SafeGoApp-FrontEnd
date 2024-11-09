@@ -25,6 +25,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Community from "./community";
+import { useUserStore } from "../store/store";
+import { useRouter } from "expo-router";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -156,11 +158,9 @@ export default function App() {
       ],
     },
   ];
-
   // Referencia al MapView para centrar el mapa
   const mapRef = useRef(null);
   const [address, setAddress] = useState(""); // Estado para almacenar la dirección
-
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === "granted") {
@@ -206,6 +206,10 @@ export default function App() {
     e.stopPropagation(); // Evitar que el clic se propague al input
     setPanelOpen(!panelOpen);
   };
+
+  const { userData } = useUserStore();
+
+  const route = useRouter();
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#000" />

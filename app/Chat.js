@@ -145,7 +145,7 @@ export default function ChatScreen() {
           <View style={styles.search} />
         )}
       </View>
-      <Text style={{ marginTop: 10, marginBottom: 10 }}>
+      <Text style={{ marginTop: 10, marginBottom: 20 }}>
         {" "}
         Avisos rápidos, respuesta segura.{" "}
       </Text>
