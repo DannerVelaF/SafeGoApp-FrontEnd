@@ -9,6 +9,8 @@ import {
   StatusBar,
 } from "react-native";
 
+import LoginScreen from "./components/LoginScreen";
+
 import * as Location from "expo-location";
 import MapView from "react-native-maps";
 
@@ -49,6 +51,7 @@ export default function App() {
   };
 
   return (
+
     <View style={styles.container}>
       <StatusBar backgroundColor="#000" />
       <MapView style={styles.map} initialRegion={location} />
