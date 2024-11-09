@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 
@@ -25,7 +24,8 @@ import Panel from "./components/Panel";
 import { FontAwesome} from "@expo/vector-icons";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Community from "./components/Community";
+import  Community  from "./components/Community";
+import ChatScreen from "./components/Chat";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);

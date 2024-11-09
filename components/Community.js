@@ -1,9 +1,9 @@
-// src/LoginScreen.js
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, Image, TextInput, FlatList } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 export default function Community() {
@@ -24,26 +24,243 @@ export default function Community() {
     };
 
     const DATA = [
-        { id: '1', name: 'San Isidro', Seguridad: 'Buena', activos: '120', miembros: '200' },
-        { id: '2', name: 'Cercado de Lima', Seguridad: 'Mala', activos: '120', miembros: '200' },
-        { id: '3', name: 'Chiclayo', Seguridad: 'Peligrosa', activos: '1220', miembros: '2300' },
-        { id: '4', name: 'Miraflores', Seguridad: 'Alta', activos: '300', miembros: '500' },
-        { id: '5', name: 'Barranco', Seguridad: 'Moderada', activos: '200', miembros: '400' },
-        { id: '6', name: 'La Molina', Seguridad: 'Buena', activos: '500', miembros: '600' },
-        { id: '7', name: 'Callao', Seguridad: 'Peligrosa', activos: '1500', miembros: '2000' },
-        { id: '8', name: 'Surco', Seguridad: 'Alta', activos: '320', miembros: '450' },
-        { id: '9', name: 'Rímac', Seguridad: 'Moderada', activos: '80', miembros: '150' },
-        { id: '10', name: 'San Miguel', Seguridad: 'Alta', activos: '400', miembros: '520' },
-        { id: '11', name: 'Jesús María', Seguridad: 'Buena', activos: '250', miembros: '300' },
-        { id: '12', name: 'Magdalena', Seguridad: 'Alta', activos: '360', miembros: '470' },
-    ];
+      {
+          id: '1',
+          name: 'San Isidro',
+          Seguridad: 'Buena',
+          activos: '120',
+          miembros: '200',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '123456' },
+              { tipo: 'Policía', telefono: '789101' },
+              { tipo: 'Salud', telefono: '5551234' },
+          ]
+      },
+      {
+          id: '2',
+          name: 'Cercado de Lima',
+          Seguridad: 'Mala',
+          activos: '120',
+          miembros: '200',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '123987' },
+              { tipo: 'Policía', telefono: '654321' },
+          ]
+      },
+      {
+          id: '3',
+          name: 'Chiclayo',
+          Seguridad: 'Peligrosa',
+          activos: '1220',
+          miembros: '2300',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '998877' },
+              { tipo: 'Policía', telefono: '334455' },
+              { tipo: 'Salud', telefono: '662233' },
+          ]
+      },
+      {
+          id: '4',
+          name: 'Miraflores',
+          Seguridad: 'Alta',
+          activos: '300',
+          miembros: '500',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '441122' },
+              { tipo: 'Policía', telefono: '332211' },
+          ]
+      },
+      {
+          id: '5',
+          name: 'Barranco',
+          Seguridad: 'Moderada',
+          activos: '200',
+          miembros: '400',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '554433' },
+              { tipo: 'Policía', telefono: '667788' },
+          ]
+      },
+      {
+          id: '6',
+          name: 'La Molina',
+          Seguridad: 'Buena',
+          activos: '500',
+          miembros: '600',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '998899' },
+              { tipo: 'Policía', telefono: '334499' },
+          ]
+      },
+      {
+          id: '7',
+          name: 'Callao',
+          Seguridad: 'Peligrosa',
+          activos: '1500',
+          miembros: '2000',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '778855' },
+              { tipo: 'Policía', telefono: '559933' },
+              { tipo: 'Salud', telefono: '441122' },
+          ]
+      },
+      {
+          id: '8',
+          name: 'Surco',
+          Seguridad: 'Alta',
+          activos: '320',
+          miembros: '450',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '221188' },
+              { tipo: 'Policía', telefono: '667788' },
+          ]
+      },
+      {
+          id: '9',
+          name: 'Rímac',
+          Seguridad: 'Moderada',
+          activos: '80',
+          miembros: '150',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '553322' },
+              { tipo: 'Policía', telefono: '445566' },
+          ]
+      },
+      {
+          id: '10',
+          name: 'San Miguel',
+          Seguridad: 'Alta',
+          activos: '400',
+          miembros: '520',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '112233' },
+              { tipo: 'Policía', telefono: '334455' },
+          ]
+      },
+      {
+          id: '11',
+          name: 'Jesús María',
+          Seguridad: 'Buena',
+          activos: '250',
+          miembros: '300',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '778899' },
+              { tipo: 'Policía', telefono: '554433' },
+          ]
+      },
+      {
+          id: '12',
+          name: 'Magdalena',
+          Seguridad: 'Alta',
+          activos: '360',
+          miembros: '470',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '998877' },
+              { tipo: 'Policía', telefono: '223344' },
+              { tipo: 'Salud', telefono: '663322' },
+          ]
+      },
+      {
+          id: '13',
+          name: 'Los Olivos',
+          Seguridad: 'Moderada',
+          activos: '600',
+          miembros: '800',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '445599' },
+              { tipo: 'Policía', telefono: '224466' },
+          ]
+      },
+      {
+          id: '14',
+          name: 'San Borja',
+          Seguridad: 'Buena',
+          activos: '480',
+          miembros: '650',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '665544' },
+              { tipo: 'Policía', telefono: '337755' },
+          ]
+      },
+      {
+          id: '15',
+          name: 'Comas',
+          Seguridad: 'Peligrosa',
+          activos: '1000',
+          miembros: '1500',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '887766' },
+              { tipo: 'Policía', telefono: '445566' },
+              { tipo: 'Salud', telefono: '998855' },
+          ]
+      },
+      {
+          id: '16',
+          name: 'Villa María del Triunfo',
+          Seguridad: 'Mala',
+          activos: '900',
+          miembros: '1200',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '334466' },
+              { tipo: 'Policía', telefono: '778899' },
+          ]
+      },
+      {
+          id: '17',
+          name: 'Pueblo Libre',
+          Seguridad: 'Buena',
+          activos: '410',
+          miembros: '500',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '554477' },
+              { tipo: 'Policía', telefono: '993322' },
+          ]
+      },
+      {
+          id: '18',
+          name: 'Lince',
+          Seguridad: 'Alta',
+          activos: '380',
+          miembros: '490',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '223311' },
+              { tipo: 'Policía', telefono: '778822' },
+          ]
+      },
+      {
+          id: '19',
+          name: 'Breña',
+          Seguridad: 'Moderada',
+          activos: '210',
+          miembros: '320',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '441199' },
+              { tipo: 'Policía', telefono: '776655' },
+          ]
+      },
+      {
+          id: '20',
+          name: 'San Juan de Miraflores',
+          Seguridad: 'Mala',
+          activos: '800',
+          miembros: '1100',
+          contactos: [
+              { tipo: 'Bomberos', telefono: '553322' },
+              { tipo: 'Policía', telefono: '554466' },
+              { tipo: 'Salud', telefono: '663388' },
+          ]
+      },
+  ];
 
-    const Item = ({ name, Seguridad, activos, miembros }) => (
+
+    const Item = ({ name, Seguridad, activos, miembros, contactos }) => {
+      return(
         <View style={styles.item}>
 
           <View style={styles.members} >
             <Image source={icon} style={{ width: 50, height: 50 }} />
             <Text>{miembros} Miembros </Text>
+            
           </View>
           
           <View style={styles.joinContainer} >
@@ -66,6 +283,7 @@ export default function Community() {
 
         </View>
     );
+  };
 
     return (
         <View style={styles.container}>
