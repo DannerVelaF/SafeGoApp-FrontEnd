@@ -16,10 +16,10 @@ export default function Panel({ isOpen, togglePanel }) {
   const [selectedIndex, setSelectedIndex] = useState(null); // Estado para la opción seleccionada
   const opts = [
     { text: "Comunidades" },
-    { text: "Chat" },
-    { text: "Seguimiento" },
-    { text: "Telefonos de emergencia" },
-    { text: "Tutorial de uso" },
+    { text: "Chat " },
+    { text: "Seguimiento " },
+    { text: "Telefonos de emergencia " },
+    { text: "Tutorial de uso " },
     { text: "Noticias" },
     { text: "Recomendaciones" },
   ];
@@ -40,7 +40,7 @@ export default function Panel({ isOpen, togglePanel }) {
         }}
       >
         <Image source={icon} style={styles.icon} />
-        <Text style={{ fontSize: 32, marginLeft: 10 }}>SafeGo</Text>
+        <Text style={{ fontSize: 32, marginLeft: 10 }}>SafeGo </Text>
       </View>
       <View
         style={{

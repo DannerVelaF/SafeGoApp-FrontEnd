@@ -22,6 +22,10 @@ const Chat = require("./assets/Chat.png");
 const HomeSafe = require("./assets/HomeSafe.png");
 const Siren = require("./assets/Siren.png");
 import Panel from "./components/Panel";
+import { FontAwesome} from "@expo/vector-icons";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Community from "./components/Community";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -37,6 +41,122 @@ export default function App() {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+
+  const darkMapStyle = [
+    {
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      elementType: "labels.icon",
+      stylers: [
+        {
+          visibility: "off",
+        },
+      ],
+    },
+    {
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      elementType: "labels.text.stroke",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      featureType: "administrative",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      featureType: "poi",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      featureType: "poi",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      featureType: "road",
+      elementType: "geometry.fill",
+      stylers: [
+        {
+          color: "#2c2c2c",
+        },
+      ],
+    },
+    {
+      featureType: "road",
+      elementType: "geometry.stroke",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      featureType: "road",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      featureType: "road",
+      elementType: "labels.text.stroke",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      featureType: "water",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#000000",
+        },
+      ],
+    },
+    {
+      featureType: "water",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#3d3d3d",
+        },
+      ],
+    },
+  ];
 
   // Referencia al MapView para centrar el mapa
   const mapRef = useRef(null);
@@ -88,12 +208,14 @@ export default function App() {
     setPanelOpen(!panelOpen);
   };
   return (
+
     <View style={styles.container}>
-      <StatusBar backgroundColor="#000" />
+  <StatusBar backgroundColor="#000" />
       <MapView
         ref={mapRef} // Asigna la referencia al MapView
         style={styles.map}
         initialRegion={location}
+        customMapStyle={darkMapStyle}
         onPress={() => setPanelOpen(false)}
       >
         <Marker
@@ -136,14 +258,14 @@ export default function App() {
           onPressOut={() => setHoverGPS(false)}
           onPress={getLocationAsync} // Ejecutar la función al presionar el botón
         >
-          <Image source={GPS} style={styles.iconSize} />
+          <Ionicons name="locate-sharp" size={30} color="#31E981" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.botonesLeft, hoverIndicaciones && styles.botonHover]}
           onPressIn={() => setHoverIndicaciones(true)}
           onPressOut={() => setHoverIndicaciones(false)}
         >
-          <Image source={Indicaciones} style={styles.iconSize} />
+          <FontAwesome6 name="road" size={30} color="#31E981" />
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainerRight}>
@@ -152,21 +274,21 @@ export default function App() {
           onPressIn={() => setHoverStar(true)}
           onPressOut={() => setHoverStar(false)}
         >
-          <Image source={Star} style={styles.iconSize} />
+          <FontAwesome name="star" size={30} color="#31E981" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.botonesLeft, hoverChat && styles.botonHover]}
           onPressIn={() => setHoverChat(true)}
           onPressOut={() => setHoverChat(false)}
         >
-          <Image source={Chat} style={styles.iconSize} />
+          <Ionicons name="chatbubbles" size={30} color="#31E981" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.botonesLeft, hoverHomeSafe && styles.botonHover]}
           onPressIn={() => setHoverHomeSafe(true)}
           onPressOut={() => setHoverHomeSafe(false)}
         >
-          <Image source={HomeSafe} style={styles.iconSize} />
+          <FontAwesome6 name="house-lock" size={30} color="#31E981" />
         </TouchableOpacity>
       </View>
       <View style={[styles.sirenButton, hoverSiren && styles.sirenButtonHover]}>
@@ -181,8 +303,10 @@ export default function App() {
   );
 }
 
+
+
 const styles = StyleSheet.create({
-  map: {
+  map:{
     width: "100%",
     height: "100%",
     position: "absolute",
@@ -300,12 +424,22 @@ const styles = StyleSheet.create({
     bottom: 50,
     borderRadius: 50,
     padding: 20,
+    shadowColor: "red",
+    shadowColor: "#f00",
+shadowOffset: {
+	width: 10,
+	height: 12,
+},
+shadowOpacity: 0.58,
+shadowRadius: 26.00,
+
+elevation: 24,
   },
   sirenButtonHover: {
     shadowColor: "red",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 15 }, // Ajustar el desplazamiento de la sombra
+    shadowOpacity: 1,      // Sombra más fuerte cuando está en hover
+    shadowRadius: 30,      // Aumentar el radio de la sombra
+    elevation: 15,         // Aumentar la elevación al estado hover
   },
 });
