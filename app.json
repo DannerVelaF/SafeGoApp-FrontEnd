@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "safego",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -23,8 +24,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-font"
-    ]
+    "description": "SafeGo App Frontend",
+    "plugins": ["expo-font", "expo-router"]
   }
 }
