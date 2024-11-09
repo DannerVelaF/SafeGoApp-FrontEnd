@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Image,
   StyleSheet,
@@ -12,19 +12,18 @@ import {
 import LoginScreen from "./components/LoginScreen";
 
 import * as Location from "expo-location";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 
 const icon = require("./assets/safegoIcon.png");
 const menu = require("./assets/Menu.png");
 const search = require("./assets/Search.png");
 const Indicaciones = require("./assets/Indicaciones.png");
 const GPS = require("./assets/GPS.png");
-
 const Star = require("./assets/Star.png");
 const Chat = require("./assets/Chat.png");
 const HomeSafe = require("./assets/HomeSafe.png");
-
 const Siren = require("./assets/Siren.png");
+import Panel from "./components/Panel";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -32,9 +31,8 @@ export default function App() {
   const [hoverHomeSafe, setHoverHomeSafe] = useState(false);
   const [hoverChat, setHoverChat] = useState(false);
   const [hoverStar, setHoverStar] = useState(false);
-  const [hoverSiren, setHoverSiren] = useState(false); // Agregar estado para la sirena
+  const [hoverSiren, setHoverSiren] = useState(false);
 
-  // Estados para la ubicación del usuario
   const [location, setLocation] = useState({
     latitude: -6.77137,
     longitude: -79.84088,
@@ -42,32 +40,96 @@ export default function App() {
     longitudeDelta: 0.0421,
   });
 
-  useEffect(() => {}, []);
+  // Referencia al MapView para centrar el mapa
+  const mapRef = useRef(null);
+  const [address, setAddress] = useState(""); // Estado para almacenar la dirección
 
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
-    const location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-  };
+    if (status === "granted") {
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      const newLocation = {
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      };
+      setLocation(newLocation);
 
+      // Centrar el mapa en la nueva ubicación
+      if (mapRef.current) {
+        mapRef.current.animateToRegion(newLocation, 1000); // Tiempo en ms para la animación
+      }
+
+      // Obtener la dirección a partir de las coordenadas
+      const addressData = await Location.reverseGeocodeAsync({
+        latitude: newLocation.latitude,
+        longitude: newLocation.longitude,
+      });
+
+      if (addressData.length > 0) {
+        // Aquí se mejorará la concatenación de la dirección
+        const { street, city, region, country, postalCode } = addressData[0];
+        let formattedAddress = ` ${city || ""}, ${region || ""}, ${
+          country || ""
+        }`;
+        if (postalCode) {
+          formattedAddress += `, ${postalCode}`; // Agregar el código postal si está disponible
+        }
+        setAddress(formattedAddress.trim());
+      } else {
+        setAddress("Dirección no disponible");
+      }
+    } else {
+      alert("Permission to access location was denied");
+    }
+  };
+  const [panelOpen, setPanelOpen] = useState(false); // Estado para controlar si el panel está abierto o cerrado
+  const handleMenuClick = (e) => {
+    e.stopPropagation(); // Evitar que el clic se propague al input
+    setPanelOpen(!panelOpen);
+  };
   return (
 
     <View style={styles.container}>
       <StatusBar backgroundColor="#000" />
-      <MapView style={styles.map} initialRegion={location} />
+      <MapView
+        ref={mapRef} // Asigna la referencia al MapView
+        style={styles.map}
+        initialRegion={location}
+        onPress={() => setPanelOpen(false)}
+      >
+        <Marker
+          draggable
+          coordinate={location}
+          onDragEnd={(direction) =>
+            setLocation(direction.nativeEvent.coordinate)
+          }
+        />
+      </MapView>
+      <Panel isOpen={panelOpen} togglePanel={() => setPanelOpen(!panelOpen)} />
+
       <View style={styles.header} id="Search bar">
         <Image source={icon} style={styles.icon} />
         <View style={styles.inputContainer}>
-          <Image source={menu} style={styles.menuIconLeft} />
+          <TouchableOpacity
+            style={styles.menuboxleft}
+            onPress={handleMenuClick} // Abrir o cerrar el menú al hacer clic
+          >
+            <Image source={menu} style={styles.menuIconLeft} />
+          </TouchableOpacity>
           <TextInput
-            placeholder="Ingresa tu dirección"
+            placeholder="Ingresa una dirección"
             style={styles.buscadorDireccion}
           />
           <Image source={search} style={styles.menuIconRight} />
         </View>
       </View>
       <View style={styles.locationContainer}>
-        <Text style={styles.locationText}>Ubicado en: Direccion actual</Text>
+        <Text style={styles.locationText}>
+          Ubicado en:{" "}
+          {address ? address : `${location.latitude}, ${location.longitude}`}
+        </Text>
       </View>
 
       <View style={styles.buttonContainerLeft}>
@@ -75,6 +137,7 @@ export default function App() {
           style={[styles.botonesLeft, hoverGPS && styles.botonHover]}
           onPressIn={() => setHoverGPS(true)}
           onPressOut={() => setHoverGPS(false)}
+          onPress={getLocationAsync} // Ejecutar la función al presionar el botón
         >
           <Image source={GPS} style={styles.iconSize} />
         </TouchableOpacity>
@@ -111,8 +174,8 @@ export default function App() {
       </View>
       <View style={[styles.sirenButton, hoverSiren && styles.sirenButtonHover]}>
         <TouchableOpacity
-          onPressIn={() => setHoverSiren(true)} // Activar hover al presionar
-          onPressOut={() => setHoverSiren(false)} // Desactivar hover al soltar
+          onPressIn={() => setHoverSiren(true)}
+          onPressOut={() => setHoverSiren(false)}
         >
           <Image source={Siren} style={styles.iconSize} />
         </TouchableOpacity>
@@ -129,7 +192,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
-
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -159,6 +221,16 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 10,
     zIndex: 10,
+  },
+  menuboxleft: {
+    width: "15%",
+    height: "100%",
+    position: "absolute",
+    left: 10,
+    zIndex: 10,
+    display: "flex",
+    marginStart: -10,
+    justifyContent: "center",
   },
   menuIconRight: {
     width: 20,
@@ -194,6 +266,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
+    fontSize: 10,
   },
   buttonContainerLeft: {
     position: "absolute",
@@ -202,7 +275,6 @@ const styles = StyleSheet.create({
     display: "flex",
     gap: 26,
   },
-
   buttonContainerRight: {
     position: "absolute",
     bottom: 200,
@@ -210,7 +282,6 @@ const styles = StyleSheet.create({
     display: "flex",
     gap: 26,
   },
-
   botonesLeft: {
     width: 62,
     height: 62,
@@ -219,7 +290,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 50,
   },
-
   iconSize: {
     width: 50,
     height: 50,
@@ -227,8 +297,6 @@ const styles = StyleSheet.create({
   botonHover: {
     backgroundColor: "rgba(0, 0, 0, 0.1)",
   },
-
-  // Estilo del botón de la sirena
   sirenButton: {
     backgroundColor: "red",
     position: "absolute",
@@ -237,10 +305,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sirenButtonHover: {
-    shadowColor: "red", // Establece el color de la sombra a rojo
-    shadowOffset: { width: 0, height: 10 }, // Desplazamiento de la sombra
-    shadowOpacity: 0.8, // Opacidad de la sombra
-    shadowRadius: 10, // Radio de la sombra
-    elevation: 10, // Elevación para Android
+    shadowColor: "red",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 10,
   },
 });
