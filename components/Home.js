@@ -23,7 +23,7 @@ const HomeSafe = require("./assets/HomeSafe.png");
 const Siren = require("./assets/Siren.png");
 import Panel from "./components/Panel";
 
-export default function App() {
+export default function Home() {
   const [hoverGPS, setHoverGPS] = useState(false);
   const [hoverIndicaciones, setHoverIndicaciones] = useState(false);
   const [hoverHomeSafe, setHoverHomeSafe] = useState(false);
