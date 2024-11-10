@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "react-native";
+import { Button, TouchableOpacity } from "react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router"; // Importamos useRouter para la navegación
 import { useUserStore } from "../store/store";
@@ -19,10 +19,10 @@ export default function Panel({ isOpen, togglePanel }) {
   const router = useRouter(); // Instanciamos el hook useRouter
   const opts = [
     { text: "Comunidades", route: "/community" },
-    { text: "Chat", route: "/chat" },
-    { text: "Seguimiento", route: "/tracking" },
-    { text: "Telefonos de emergencia", route: "/emergency" },
-    { text: "Tutorial de uso", route: "/tutorial" },
+    { text: "Chat ", route: "/chat" },
+    { text: "Seguimiento ", route: "/tracking" },
+    { text: "Telefonos de emergencia ", route: "/emergency" },
+    { text: "Tutorial de uso ", route: "/tutorial" },
     { text: "Noticias", route: "/news" },
   ];
 
