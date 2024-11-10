@@ -56,7 +56,7 @@ export default function Panel({ isOpen, togglePanel }) {
           fontWeight: "bold",
         }}
       >
-        Bienvenido {user.lastName}
+        Bienvenido {user.username}
       </Text>
       <View
         style={{

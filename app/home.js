@@ -24,9 +24,9 @@ import Panel from "./panel";
 import { FontAwesome } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Community from "./community";
 import { useUserStore } from "../store/store";
 import { useRouter } from "expo-router";
+import MapViewDirections from "react-native-maps-directions";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -37,12 +37,15 @@ export default function App() {
   const [hoverSiren, setHoverSiren] = useState(false);
 
   const [location, setLocation] = useState({
-    latitude: -6.77137,
-    longitude: -79.84088,
+    latitude: -6.778267750927057,
+    longitude: -79.84472684077221,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-
+  const [origin, setOrigin] = useState({
+    latitude: -6.7793364545583845,
+    longitude: -79.83944788239306,
+  });
   const darkMapStyle = [
     {
       elementType: "geometry",
@@ -160,7 +163,8 @@ export default function App() {
   ];
   // Referencia al MapView para centrar el mapa
   const mapRef = useRef(null);
-  const [address, setAddress] = useState(""); // Estado para almacenar la dirección
+  const [address, setAddress] = useState(""); // Estado para almacenar la dirección]
+
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === "granted") {
@@ -208,8 +212,9 @@ export default function App() {
   };
 
   const { userData } = useUserStore();
-
   const route = useRouter();
+
+  const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#000" />
@@ -226,6 +231,23 @@ export default function App() {
           onDragEnd={(direction) =>
             setLocation(direction.nativeEvent.coordinate)
           }
+        />
+        <Marker
+          draggable
+          coordinate={origin}
+          onDragEnd={(direction) => setOrigin(direction.nativeEvent.coordinate)}
+        />
+        {/* <Polyline
+          coordinates={[location, origin]}
+          strokeColor="#31E981"
+          strokeWidth={2}
+        /> */}
+        <MapViewDirections
+          origin={origin}
+          destination={location}
+          apikey={GOOGLE_MAPS_API_KEY}
+          strokeColor="#31E981"
+          strokeWidth={2}
         />
       </MapView>
       <Panel isOpen={panelOpen} togglePanel={() => setPanelOpen(!panelOpen)} />
