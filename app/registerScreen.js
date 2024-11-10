@@ -9,7 +9,6 @@ import {
 } from "react-native";
 
 import { FontAwesome } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import Checkbox from "expo-checkbox";
 import api from "../service/api";
 import { useUserStore } from "../store/store";
@@ -73,7 +72,7 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar animated={true} backgroundColor="#000" />
+      <StatusBar animated={true}  backgroundColor="#00120B"  barStyle="dark" />
       <View style={styles.loginBox}>
         <Text style={styles.title}>Registrarse</Text>
         <Text style={styles.subtitle}>Ingresa tus datos</Text>
@@ -140,6 +139,21 @@ export default function RegisterScreen() {
             placeholder="Distrito/Ciudad/Calle y número"
             onChangeText={(text) => setData({ ...data, address: text })}
           />
+        </View>
+
+          <View style={styles.singleInput}>
+            <FontAwesome
+              name="user"
+              size={20}
+              color="#666"
+              style={styles.icon}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Usuario"
+              onChangeText={(text) => setData({ ...data, username: text })}
+            />
         </View>
 
         <View style={styles.singleInput}>

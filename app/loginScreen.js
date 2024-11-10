@@ -51,7 +51,7 @@ export default function LoginScreen() {
       source={require("../assets/Login.png")}
       style={styles.background}
     >
-      <StatusBar animated={true} backgroundColor="#000" />
+      <StatusBar animated={true}  backgroundColor="#00120B"  barStyle="dark" />
       <View style={styles.container}>
         <View style={styles.loginBox}>
           <Text style={styles.title}>Iniciar Sesión</Text>
