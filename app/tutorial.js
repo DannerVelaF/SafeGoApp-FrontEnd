@@ -16,10 +16,12 @@ const imagen3 = require("../assets/tutorial/3.png");
 const imagen4 = require("../assets/tutorial/4.png");
 const imagen5 = require("../assets/tutorial/5.png");
 const imagen6 = require("../assets/tutorial/6.png");
-const imagen7 = require("../assets/tutorial/7.png");
+// const imagen7 = require("../assets/tutorial/7.png");
 
 const puntoHueco = require("../assets/tutorial/puntoHueco.png");
 const puntoLleno = require("../assets/tutorial/puntoLleno.png");
+
+import { BlurView } from "expo-blur"; // Importamos BlurView
 
 export default function Tutorial() {
   const [imagen, setImagen] = useState(imagen1); // Inicializamos con la primera imagen
