@@ -93,8 +93,10 @@ const consultarTotalUsuarios = async (id, token) => {
 };
 
 const consultarNoticias = async (token, location) => {
+  console.log(location);
+
   try {
-    const response = await api.get(`news/{location}`, {
+    const response = await api.get(`news/${location}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
