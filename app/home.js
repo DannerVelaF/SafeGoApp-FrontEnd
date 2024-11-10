@@ -172,10 +172,15 @@ export default function App() {
       ],
     },
   ];
-
+  const [GPSPress, setGPSPress] = useState(false);
+  
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === "granted") {
+      setGPSPress(true);
+      setTimeout(() => {
+        setGPSPress(false);
+      }, 2000);
       const currentLocation = await Location.getCurrentPositionAsync({});
       const newLocation = {
         latitude: currentLocation.coords.latitude,
@@ -241,18 +246,33 @@ export default function App() {
   const getIconForPlace = (place) => {
     // Asigna un ícono según el tipo de lugar
     if (place.types.includes("hospital")) {
-      return require("../assets/hospital.png");
+      return require("../assets/hospital.png"); // o una URL
     } else if (place.types.includes("police")) {
-      return require("../assets/policeman.png");
+      return require("../assets/policeman.png"); // o una URL
     } else if (place.types.includes("pharmacy")) {
-      return require("../assets/medicine.png");
+      return require("../assets/medicine.png"); // o una URL
     } else {
-      return require("../assets/marker.png");
+      return require("../assets/default.png"); // Ícono por defecto si no se encuentra tipo específico
     }
   };
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
   return (
     <View style={styles.container}>
+      {GPSPress ? (
+        <Text
+          style={{
+            backgroundColor: "#FFFFFF",
+            zIndex: 10,
+            position: "absolute",
+            bottom: 150,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 10,
+          }}
+        >
+          Se actualizo la ubicación de tu dispositivo.
+        </Text>
+      ) : null}
       <StatusBar backgroundColor="#000" />
       <MapView
         ref={mapRef} // Asigna la referencia al MapView

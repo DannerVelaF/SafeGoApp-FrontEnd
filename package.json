@@ -20,6 +20,7 @@
     "expo-checkbox": "~3.0.0",
     "expo-contacts": "^13.0.5",
     "expo-font": "~12.0.10",
+    "expo-image-picker": "~15.0.7",
     "expo-location": "^17.0.1",
     "expo-router": "~3.5.24",
     "expo-status-bar": "~1.12.1",

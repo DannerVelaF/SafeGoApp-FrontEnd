@@ -1,5 +1,5 @@
 // src/LoginScreen.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -19,7 +19,9 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import { useRouter } from "expo-router"; // Importa el hook useRouter
-
+import api from "../service/api";
+import { useUserStore } from "../store/store";
+import CommunityDetail from "./CommunityDetails";
 export default function Community() {
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -31,6 +33,11 @@ export default function Community() {
   const menu = require("../assets/Menu.png");
   const search = require("../assets/Search.png");
   const [panelOpen, setPanelOpen] = useState(false);
+  const [selectedCommunity, setSelectedCommunity] = useState(null); // Estado para la comunidad seleccionada
+
+  const handleItemPress = (community) => {
+    setSelectedCommunity(community); // Almacena la comunidad seleccionada en el estado
+  };
 
   const handleMenuClick = (e) => {
     e.stopPropagation();
@@ -45,118 +52,85 @@ export default function Community() {
       activos: "120",
       miembros: "200",
     },
-    {
-      id: "2",
-      name: "Cercado de Lima",
-      Seguridad: "Mala",
-      activos: "120",
-      miembros: "200",
-    },
-    {
-      id: "3",
-      name: "Chiclayo",
-      Seguridad: "Peligrosa",
-      activos: "1220",
-      miembros: "2300",
-    },
-    {
-      id: "4",
-      name: "Miraflores",
-      Seguridad: "Alta",
-      activos: "300",
-      miembros: "500",
-    },
-    {
-      id: "5",
-      name: "Barranco",
-      Seguridad: "Moderada",
-      activos: "200",
-      miembros: "400",
-    },
-    {
-      id: "6",
-      name: "La Molina",
-      Seguridad: "Buena",
-      activos: "500",
-      miembros: "600",
-    },
-    {
-      id: "7",
-      name: "Callao",
-      Seguridad: "Peligrosa",
-      activos: "1500",
-      miembros: "2000",
-    },
-    {
-      id: "8",
-      name: "Surco",
-      Seguridad: "Alta",
-      activos: "320",
-      miembros: "450",
-    },
-    {
-      id: "9",
-      name: "Rímac",
-      Seguridad: "Moderada",
-      activos: "80",
-      miembros: "150",
-    },
-    {
-      id: "10",
-      name: "San Miguel",
-      Seguridad: "Alta",
-      activos: "400",
-      miembros: "520",
-    },
-    {
-      id: "11",
-      name: "Jesús María",
-      Seguridad: "Buena",
-      activos: "250",
-      miembros: "300",
-    },
-    {
-      id: "12",
-      name: "Magdalena",
-      Seguridad: "Alta",
-      activos: "360",
-      miembros: "470",
-    },
   ];
 
-  const Item = ({ name, Seguridad, activos, miembros }) => (
-    <View style={styles.item}>
-      <View style={styles.members}>
-        <Image source={icon} style={{ width: 50, height: 50 }} />
-        <Text>{miembros} Miembros </Text>
-      </View>
+  const Item = ({ item }) => {
+    const handlePress = () => {
+      setSelectedCommunity(item.id);
+    };
+    return (
+      <TouchableOpacity onPress={() => handlePress()}>
+        <View style={styles.item}>
+          <View style={styles.members}>
+            <Image source={icon} style={{ width: 50, height: 50 }} />
+            <Text
+              style={{
+                fontSize: 12,
+                marginTop: 5,
+              }}
+            >
+              {item.totalUsuarios} miembros
+            </Text>
+          </View>
 
-      <View style={styles.joinContainer}>
-        <Text style={styles.name}> {name} </Text>
-        <TouchableOpacity style={styles.buttonJoin}>
-          <Text style={styles.addText}>Unirse</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.joinContainer}>
+            <Text style={styles.name}> {item.name} </Text>
+            <TouchableOpacity style={styles.buttonJoin}>
+              <Text style={styles.addText}>Unirse</Text>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.activePersons}>
-        <View style={styles.lock}>
-          <FontAwesome name="lock" size={15} color="#000" style={styles.icon} />
-          <Text>Seguridad: {Seguridad} </Text>
+          <View style={styles.activePersons}>
+            <View style={styles.lock}>
+              <FontAwesome
+                name="lock"
+                size={15}
+                color="#000"
+                style={styles.icon}
+              />
+            </View>
+            <View style={styles.lock}>
+              <MaterialIcons
+                name="circle"
+                size={24}
+                color="#0f1"
+                style={styles.icon}
+              />
+            </View>
+          </View>
         </View>
-        <View style={styles.lock}>
-          <MaterialIcons
-            name="circle"
-            size={24}
-            color="#0f1"
-            style={styles.icon}
-          />
-          <Text>{activos} Activos </Text>
-        </View>
-      </View>
-    </View>
-  );
+      </TouchableOpacity>
+    );
+  };
+
   const router = useRouter();
 
+  const [data, setData] = useState([]);
+
+  const { userData } = useUserStore();
+  const { token } = userData;
+
+  const getData = async () => {
+    try {
+      // Primero consulta la comunidad
+      const comunidad = await api.consultarComunidad(token);
+      // Luego consulta el total de usuarios para la comunidad específica
+      const usuarios = await api.consultarTotalUsuarios(comunidad[0].id, token);
+      // Agrega la cantidad de usuarios al objeto de comunidad
+      const comunidadConUsuarios = comunidad.map((com) => ({
+        ...com,
+        totalUsuarios: usuarios.length,
+      }));
+
+      setData(comunidadConUsuarios);
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <View style={styles.container}>
       <StatusBar animated={true} backgroundColor="#000" />
@@ -165,67 +139,75 @@ export default function Community() {
           name="arrow-circle-left"
           size={40}
           color="black"
-          onPress={() => router.push("/home")}
+          onPress={() => {
+            selectedCommunity
+              ? router.push("/community")
+              : router.push("/home");
+          }}
         />
         <Text style={styles.CommunityText}>Comunidad</Text>
-        <TouchableOpacity
-          style={styles.addItem}
-          onPress={() => router.push("/comunityForm")}
-        >
-          <Text style={styles.addText}>Añadir</Text>
-          <FontAwesome name="plus" size={12} color="white" />
-        </TouchableOpacity>
+        {!selectedCommunity ? (
+          <TouchableOpacity
+            style={styles.addItem}
+            onPress={() => router.push("/comunityForm")}
+          >
+            <Text style={styles.addText}>Añadir</Text>
+            <FontAwesome name="plus" size={12} color="white" />
+          </TouchableOpacity>
+        ) : (
+          <View></View>
+        )}
       </View>
 
       <View style={styles.search} id="Search bar">
-        <View style={styles.inputContainer}>
-          <TouchableOpacity
-            style={styles.menuboxleft}
-            onPress={handleMenuClick}
-          >
-            <Image source={menu} style={styles.menuIconLeft} />
-          </TouchableOpacity>
-          <TextInput
-            placeholder="Buscar Comunidad"
-            style={styles.buscadorDireccion}
-          />
-          <Image source={search} style={styles.menuIconRight} />
-        </View>
-      </View>
-
-      <View style={styles.listComunity}>
-        <FlatList
-          data={DATA}
-          renderItem={({ item }) => (
-            <Item
-              name={item.name}
-              Seguridad={item.Seguridad}
-              activos={item.activos}
-              miembros={item.miembros}
+        {!selectedCommunity ? (
+          <View style={styles.inputContainer}>
+            <TouchableOpacity
+              style={styles.menuboxleft}
+              onPress={handleMenuClick}
+            >
+              <Image source={menu} style={styles.menuIconLeft} />
+            </TouchableOpacity>
+            <TextInput
+              placeholder="Buscar Comunidad"
+              style={styles.buscadorDireccion}
             />
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 80 }} // Espacio extra en la parte inferior
-        />
+            <Image source={search} style={styles.menuIconRight} />
+          </View>
+        ) : null}
       </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerItem}>
-          <FontAwesome name="location-arrow" size={24} color="#31E981" />
-          <Text style={styles.footerText}>Más cercanos</Text>
-        </TouchableOpacity>
+      {selectedCommunity ? (
+        <CommunityDetail communityId={selectedCommunity} data={data} />
+      ) : (
+        <>
+          <View style={styles.listComunity}>
+            <FlatList
+              data={data}
+              renderItem={({ item }) => <Item item={item} />}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 80 }} // Espacio extra en la parte inferior
+            />
+          </View>
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.footerItem}>
+              <FontAwesome name="location-arrow" size={24} color="#31E981" />
+              <Text style={styles.footerText}>Más cercanos</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.footerItem}>
-          <FontAwesome6 name="map-location" size={24} color="#31E981" />
-          <Text style={styles.footerText}>Provincias</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.footerItem}>
+              <FontAwesome6 name="map-location" size={24} color="#31E981" />
+              <Text style={styles.footerText}>Provincias</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.footerItem}>
-          <FontAwesome6 name="users-viewfinder" size={24} color="#31E981" />
-          <Text style={styles.footerText}>Distritos</Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity style={styles.footerItem}>
+              <FontAwesome6 name="users-viewfinder" size={24} color="#31E981" />
+              <Text style={styles.footerText}>Distritos</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -261,7 +243,7 @@ const styles = StyleSheet.create({
   },
   buttonJoin: {
     backgroundColor: "#000",
-    padding: 10,
+    padding: 5,
     borderRadius: 10,
     width: "100%",
     alignItems: "center",
@@ -385,7 +367,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   name: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
+    marginBottom: 10,
   },
 });
