@@ -5,9 +5,6 @@ import { useRouter } from "expo-router"; // Importamos useRouter para la navegac
 import { useUserStore } from "../store/store";
 
 const icon = require("../assets/safegoIcon.png");
-const light = require("../assets/Idea.png");
-const night = require("../assets/Fog.png");
-const Settings = require("../assets/Settings.png");
 
 const Facebook = require("../assets/Facebook.png");
 const Twitter = require("../assets/Twitter.png");
@@ -77,16 +74,7 @@ export default function Panel({ isOpen, togglePanel }) {
           </Text>
         ))}
       </View>
-      <Text
-        style={{
-          marginTop: 20,
-          fontSize: 14,
-          marginBottom: 10,
-          textAlign: "center",
-        }}
-      >
-        Estado del usuario
-      </Text>
+
       <View
         style={{
           display: "flex",
@@ -97,53 +85,7 @@ export default function Panel({ isOpen, togglePanel }) {
           alignItems: "center",
           marginTop: 40,
         }}
-      >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 2,
-            backgroundColor: "#fff",
-            borderTopRightRadius: 10,
-            borderBottomRightRadius: 10,
-            borderRadius: 10,
-            overflow: "hidden",
-            height: 44,
-            width: 150,
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 5,
-              flex: 1,
-            }}
-          >
-            <Image source={light} style={{ width: 31, height: "100%" }} />
-          </View>
-          <View
-            style={{
-              backgroundColor: "#000",
-              display: "flex",
-              alignItems: "center",
-              padding: 5,
-              justifyContent: "center",
-              flex: 1,
-            }}
-          >
-            <Image source={night} style={{ width: 31, height: "100%" }} />
-          </View>
-        </View>
-        <Image source={Settings} style={{ width: 30, height: 30 }} />
-      </View>
+      ></View>
       <View
         style={{
           width: 150,

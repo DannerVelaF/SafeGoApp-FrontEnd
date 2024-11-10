@@ -28,6 +28,7 @@ import { useUserStore } from "../store/store";
 import { useRouter } from "expo-router";
 import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
+import ModalRuta from "./modalRuta";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -173,7 +174,7 @@ export default function App() {
     },
   ];
   const [GPSPress, setGPSPress] = useState(false);
-  
+
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === "granted") {
@@ -256,6 +257,8 @@ export default function App() {
     }
   };
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
+  const [openModal, setOpenModal] = useState(false);
+
   return (
     <View style={styles.container}>
       {GPSPress ? (
@@ -274,6 +277,7 @@ export default function App() {
         </Text>
       ) : null}
       <StatusBar backgroundColor="#000" />
+      {openModal ? <ModalRuta setOpenModal={setOpenModal} /> : null}
       <MapView
         ref={mapRef} // Asigna la referencia al MapView
         style={styles.map}
@@ -355,6 +359,7 @@ export default function App() {
           style={[styles.botonesLeft, hoverIndicaciones && styles.botonHover]}
           onPressIn={() => setHoverIndicaciones(true)}
           onPressOut={() => setHoverIndicaciones(false)}
+          onPress={() => setOpenModal(true)}
         >
           <FontAwesome6 name="road" size={30} color="#31E981" />
         </TouchableOpacity>
