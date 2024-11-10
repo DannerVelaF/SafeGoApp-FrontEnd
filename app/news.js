@@ -34,7 +34,7 @@ export default function NewsInterface() {
     { key: "san-isidro", value: "San Isidro " },
     { key: "miraflores", value: "Miraflores " },
     { key: "surco", value: "Surco" },
-    { key: "san-borja", value: "San Borja " },
+    { key: "san-borja", value: "San Borja" },
     { key: "chiclayo", value: "Chiclayo " },
     { key: "lima", value: "Lima" },
   ];
