@@ -9,10 +9,16 @@ import {
   Button,
   Image,
 } from "react-native";
+import api from "../service/api";
+import { useUserStore } from "../store/store";
 const ingresar = require("../assets/Ingresar.png");
+const chatDark = require("../assets/ChatDark.png");
+
 export default function CommunityDetail({ communityId, data }) {
   const key = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
-  const community = data.find((item) => item.id === communityId);
+  const [community, setCommunity] = useState(
+    data.find((item) => item.id === communityId)
+  );
   const [placePhoto, setPlacePhoto] = useState(null); // Estado para la foto del lugar
 
   const contactos = [
@@ -21,6 +27,26 @@ export default function CommunityDetail({ communityId, data }) {
     { tipo: "Teléfono 3", telefono: community.phone3 },
     { tipo: "Teléfono 4", telefono: community.phone4 },
   ];
+
+  const { userData } = useUserStore();
+  const { token } = userData;
+  //   alert(JSON.stringify(data));
+  const fetchData = async () => {
+    try {
+      const comunidad = await api.consultarComunidad(token);
+      // Luego consulta el total de usuarios para la comunidad específica
+      const usuarios = await api.consultarTotalUsuarios(communityId, token);
+      // Agrega la cantidad de usuarios al objeto de comunidad
+      const comunidadConUsuarios = comunidad.map((com) => ({
+        ...com,
+        totalUsuarios: usuarios.length,
+      }));
+
+      setCommunity(comunidadConUsuarios[0]);
+    } catch (error) {
+      alert("Error al obtener los datos:", error.mes);
+    }
+  };
 
   // Función para obtener el Place ID basado en la latitud y longitud
   const fetchPlaceId = async (latitude, longitude) => {
@@ -73,11 +99,10 @@ export default function CommunityDetail({ communityId, data }) {
     <View style={styles.container}>
       <View
         style={{
-          borderColor: "black",
           borderRadius: 10, // Se usa "borderRadius" en lugar de "rounded"
-          borderWidth: 1,
           paddingHorizontal: 18,
           paddingVertical: 23,
+          backgroundColor: "#fff",
         }}
       >
         <View
@@ -119,41 +144,128 @@ export default function CommunityDetail({ communityId, data }) {
             ) : (
               <Text>Cargando foto del lugar...</Text>
             )}
+            <Text
+              style={{
+                marginTop: 10,
+                fontWeight: "bold",
+              }}
+            >
+              {community.totalUsuarios}{" "}
+              {community.totalUsuarios === 1 ? "Miembro" : "Miembros"}
+            </Text>
           </View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#000",
-              flexDirection: "row",
-              gap: 10,
-              alignItems: "center",
-              paddingHorizontal: 16,
-              borderRadius: 15,
-              marginBottom: "auto",
-            }}
-          >
-            <Text style={{ color: "#fff" }}>Unirse</Text>
-            <Image source={ingresar} style={{ width: 30, height: 30 }} />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#000",
+                flexDirection: "row",
+                gap: 10,
+                alignItems: "center",
+                paddingHorizontal: 16,
+                borderRadius: 15,
+                marginBottom: "auto",
+              }}
+            >
+              <Text style={{ color: "#fff" }}>Unirse</Text>
+              <Image source={ingresar} style={{ width: 30, height: 30 }} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={fetchData}
+              style={{
+                backgroundColor: "#35605A",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                borderRadius: 15,
+                marginBottom: "auto",
+              }}
+            >
+              <Text style={{ color: "#fff" }}>Actualizar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* <Text>Seguridad: {Seguridad}</Text> */}
-        <Text>Miembros: {community.totalUsuarios}</Text>
         {/* <Text>Activos: {activos}</Text> */}
-        <Text style={styles.subTitle}>Contactos de Emergencia:</Text>
-        <FlatList
-          data={contactos}
-          renderItem={({ item }) => (
-            <View style={styles.contactItem}>
-              <Text>
-                {item.tipo}: {item.telefono}
-              </Text>
-            </View>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
+        <View
+          style={{
+            backgroundColor: "#D9D9D9",
+            borderRadius: 10,
+            paddingVertical: 17,
+            paddingHorizontal: 23,
+            marginTop: 20,
+          }}
+        >
+          <Text style={styles.subTitle}>Contactos de Emergencia:</Text>
+          <View
+            style={{
+              display: "flex",
+              gap: 13,
+            }}
+          >
+            {contactos.map((contacto) => (
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 10,
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingStart: 16,
+                  borderRadius: 10,
+                }}
+              >
+                <Text style={{ width: "50%" }}>{contacto.tipo}</Text>
 
-        <TouchableOpacity style={styles.joinButton}>
-          <Text style={styles.joinButtonText}>Unirse</Text>
+                <Text
+                  style={{
+                    width: "50%",
+                    backgroundColor: "black",
+                    color: "white",
+                    paddingStart: 16,
+                    paddingVertical: 5,
+                    borderRadius: 10,
+                  }}
+                >
+                  {contacto.telefono}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        <Text
+          style={{ textAlign: "center", fontWeight: "bold", marginTop: 10 }}
+        >
+          Números de Contacto con atencion 24/7
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#31E981",
+            width: "40%",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+            gap: 10,
+            marginHorizontal: "auto",
+            marginTop: 20,
+            paddingVertical: 6,
+            paddingHorizontal: 27,
+            borderRadius: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: "#000",
+              fontWeight: "bold",
+              display: "flex",
+              gap: 10,
+            }}
+          >
+            Unirse
+          </Text>
+          <Image source={chatDark} style={{ width: 30, height: 30 }} />
         </TouchableOpacity>
       </View>
     </View>
@@ -164,6 +276,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingVertical: 35,
+    backgroundColor: "#f8f8f8",
   },
   title: {
     fontSize: 24,
@@ -173,11 +286,9 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 20,
+    marginBottom: 16,
   },
-  contactItem: {
-    paddingVertical: 5,
-  },
+
   joinButton: {
     marginTop: 20,
     backgroundColor: "#000",

@@ -28,16 +28,11 @@ export default function Community() {
     Poppins_700Bold,
   });
 
-  const [passwordVisible, setPasswordVisible] = useState(false);
   const icon = require("../assets/safegoIcon.png");
   const menu = require("../assets/Menu.png");
   const search = require("../assets/Search.png");
   const [panelOpen, setPanelOpen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState(null); // Estado para la comunidad seleccionada
-
-  const handleItemPress = (community) => {
-    setSelectedCommunity(community); // Almacena la comunidad seleccionada en el estado
-  };
 
   const handleMenuClick = (e) => {
     e.stopPropagation();

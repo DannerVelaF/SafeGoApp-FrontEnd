@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "react-native";
+import { Button, TouchableOpacity } from "react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router"; // Importamos useRouter para la navegación
 import { useUserStore } from "../store/store";
