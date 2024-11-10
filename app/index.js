@@ -18,7 +18,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#000" />
+      <StatusBar backgroundColor="#00120B"  barStyle="dark" />
       <View style={styles.loginBox}>
         <Text style={styles.title}>
           Safe<Text style={styles.go}>GO</Text>{" "}
@@ -58,6 +58,8 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+
+
   subtitle: {
     fontSize: 15,
     color: "#66bb6a",
