@@ -211,7 +211,6 @@ export default function App() {
     setPanelOpen(!panelOpen);
   };
 
-  const { userData } = useUserStore();
   const route = useRouter();
 
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";

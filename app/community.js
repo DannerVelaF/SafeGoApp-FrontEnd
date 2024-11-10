@@ -168,7 +168,10 @@ export default function Community() {
           onPress={() => router.push("/home")}
         />
         <Text style={styles.CommunityText}>Comunidad</Text>
-        <TouchableOpacity style={styles.addItem}>
+        <TouchableOpacity
+          style={styles.addItem}
+          onPress={() => router.push("/comunityForm")}
+        >
           <Text style={styles.addText}>Añadir</Text>
           <FontAwesome name="plus" size={12} color="white" />
         </TouchableOpacity>

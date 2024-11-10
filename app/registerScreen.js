@@ -17,7 +17,7 @@ import { useRouter } from "expo-router"; // Importa el hook useRouter
 export default function RegisterScreen() {
   const [isChecked, setChecked] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("Vecino");
+  const [selectedRole, setSelectedRole] = useState("CITIZEN");
   const [data, setData] = useState({
     username: "",
     password: "",

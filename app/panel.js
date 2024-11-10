@@ -32,8 +32,8 @@ export default function Panel({ isOpen, togglePanel }) {
     router.push(route); // Navega a la ruta seleccionada usando Expo Router
   };
 
-  const { clearUser, userData } = useUserStore();
-  const { user } = userData;
+  const { clearUser } = useUserStore();
+
   return (
     <View style={[styles.container, isOpen ? styles.containerOpen : null]}>
       <View
@@ -56,7 +56,7 @@ export default function Panel({ isOpen, togglePanel }) {
           fontWeight: "bold",
         }}
       >
-        Bienvenido {user.username}
+        Bienvenido
       </Text>
       <View
         style={{
