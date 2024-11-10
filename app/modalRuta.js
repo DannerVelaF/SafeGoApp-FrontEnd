@@ -10,18 +10,24 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome"; // Importar FontAwesome
 import axios from "axios"; // Para hacer solicitudes HTTP
+import calculateDuration from "../service/calculatedTime";
 const location = require("../assets/Location.png");
 const clock = require("../assets/Clock.png");
 const close = require("../assets/Close.png");
-export default function ModalRuta({ setOpenModal, setDestination }) {
-  const [transportSelected, setTransportSelected] = useState("car"); // Estado para la selección del transporte
+export default function ModalRuta({
+  setOpenModal,
+  setDestination,
+  vehicleType,
+  setVehicleType,
 
+  location,
+}) {
   // Función para manejar la selección de transporte
   const handleTransportSelect = (transport) => {
-    if (transportSelected === transport) {
-      setTransportSelected(null); // Desmarcar si el mismo ícono es tocado
+    if (vehicleType === transport) {
+      setVehicleType(null); // Desmarcar si el mismo ícono es tocado
     } else {
-      setTransportSelected(transport); // Marcar el ícono seleccionado
+      setVehicleType(transport); // Marcar el ícono seleccionado
     }
   };
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
@@ -78,6 +84,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
           latitude: location.lat,
           longitude: location.lng,
         }); // Pasar las coordenadas a la prop setDestination
+        
       }
     } catch (error) {
       console.error("Error al obtener las coordenadas:", error);
@@ -210,8 +217,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
             <TouchableOpacity
               onPress={() => handleTransportSelect("car")}
               style={{
-                backgroundColor:
-                  transportSelected === "car" ? "black" : "white", // Fondo dinámico
+                backgroundColor: vehicleType === "car" ? "black" : "white", // Fondo dinámico
                 padding: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -223,7 +229,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
               <Icon
                 name="car"
                 size={20}
-                color={transportSelected === "car" ? "white" : "black"}
+                color={vehicleType === "car" ? "white" : "black"}
               />
             </TouchableOpacity>
 
@@ -232,7 +238,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
               onPress={() => handleTransportSelect("motorcycle")}
               style={{
                 backgroundColor:
-                  transportSelected === "motorcycle" ? "black" : "white", // Fondo dinámico
+                  vehicleType === "motorcycle" ? "black" : "white", // Fondo dinámico
                 padding: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -242,7 +248,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
               <Icon
                 name="motorcycle"
                 size={20}
-                color={transportSelected === "motorcycle" ? "white" : "black"}
+                color={vehicleType === "motorcycle" ? "white" : "black"}
               />
             </TouchableOpacity>
 
@@ -250,8 +256,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
             <TouchableOpacity
               onPress={() => handleTransportSelect("bus")}
               style={{
-                backgroundColor:
-                  transportSelected === "bus" ? "black" : "white", // Fondo dinámico
+                backgroundColor: vehicleType === "bus" ? "black" : "white", // Fondo dinámico
                 padding: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -261,7 +266,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
               <Icon
                 name="bus"
                 size={20}
-                color={transportSelected === "bus" ? "white" : "black"}
+                color={vehicleType === "bus" ? "white" : "black"}
               />
             </TouchableOpacity>
 
@@ -270,7 +275,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
               onPress={() => handleTransportSelect("person-walking")}
               style={{
                 backgroundColor:
-                  transportSelected === "person-walking" ? "black" : "white", // Fondo dinámico
+                  vehicleType === "person-walking" ? "black" : "white", // Fondo dinámico
                 padding: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -282,9 +287,7 @@ export default function ModalRuta({ setOpenModal, setDestination }) {
               <FontAwesome6
                 name="person-walking"
                 size={20}
-                color={
-                  transportSelected === "person-walking" ? "white" : "black"
-                }
+                color={vehicleType === "person-walking" ? "white" : "black"}
               />
             </TouchableOpacity>
           </View>

@@ -29,6 +29,7 @@ import { useRouter } from "expo-router";
 import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
 import ModalRuta from "./modalRuta";
+import calculateDuration from "../service/calculatedTime";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -258,6 +259,8 @@ export default function App() {
   };
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
   const [openModal, setOpenModal] = useState(false);
+  const [vehicleType, setVehicleType] = useState("car");
+
   return (
     <View style={styles.container}>
       {GPSPress ? (
@@ -278,10 +281,16 @@ export default function App() {
       <StatusBar backgroundColor="#000" />
       {openModal ? (
         <ModalRuta
+          vehicleType={vehicleType}
           setOpenModal={setOpenModal}
           setDestination={setDestination}
+          setVehicleType={setVehicleType}
+          destination={destination}
+          location={location}
+          setDuration={setDuration}
         />
       ) : null}
+
       <MapView
         ref={mapRef} // Asigna la referencia al MapView
         style={styles.map}
