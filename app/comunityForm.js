@@ -116,6 +116,11 @@ export default function CommunityForm() {
                   value="FAMILY"
                   style={styles.pickerItem}
                 />
+                <Picker.Item
+                  label="Distrito"
+                  value="ZONE"
+                  style={styles.pickerItem}
+                />
               </Picker>
             </View>
           </View>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, TouchableOpacity } from "react-native";
+import { Button } from "react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router"; // Importamos useRouter para la navegación
 import { useUserStore } from "../store/store";
@@ -24,7 +24,6 @@ export default function Panel({ isOpen, togglePanel }) {
     { text: "Telefonos de emergencia", route: "/emergency" },
     { text: "Tutorial de uso", route: "/tutorial" },
     { text: "Noticias", route: "/news" },
-    { text: "Recomendaciones", route: "/recommendations" },
   ];
 
   const handlePress = (index, route) => {

@@ -27,6 +27,10 @@ const loginUser = async (credentials) => {
     throw error;
   }
 };
+
+
+
+
 // Exporta la función
 export default {
   registerUser,

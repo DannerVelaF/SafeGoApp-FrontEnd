@@ -142,43 +142,6 @@ export default function RegisterScreen() {
           />
         </View>
 
-        <View style={styles.row}>
-          <View style={styles.inputGroup}>
-            <FontAwesome
-              name="user"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Usuario"
-              onChangeText={(text) => setData({ ...data, username: text })}
-            />
-          </View>
-          <View style={styles.inputGroupPicker}>
-            <Picker
-              selectedValue={selectedRole}
-              style={styles.input}
-              onValueChange={(itemValue) => setSelectedRole(itemValue)}
-              dropdownIconColor="#fff"
-              prompt="Selecciona un rol"
-              onChangeText={(text) => setData({ ...data, role: text })}
-            >
-              <Picker.Item
-                label="Vecino"
-                value="CITIZEN"
-                style={styles.pickerItem}
-              />
-              <Picker.Item
-                label="Autoridad"
-                value="AUTHORITY"
-                style={styles.pickerItem}
-              />
-            </Picker>
-          </View>
-        </View>
-
         <View style={styles.singleInput}>
           <FontAwesome name="lock" size={20} color="#666" style={styles.icon} />
           <TextInput

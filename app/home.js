@@ -27,6 +27,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useUserStore } from "../store/store";
 import { useRouter } from "expo-router";
 import MapViewDirections from "react-native-maps-directions";
+import axios from "axios";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
@@ -36,16 +37,26 @@ export default function App() {
   const [hoverStar, setHoverStar] = useState(false);
   const [hoverSiren, setHoverSiren] = useState(false);
 
+  const [address, setAddress] = useState(""); // Estado para almacenar la dirección]
+  const [places, setPlaces] = useState([]);
+  const [panelOpen, setPanelOpen] = useState(false); // Estado para controlar si el panel está abierto o cerrado]
+
+  const route = useRouter();
+  // Referencia al MapView para centrar el mapa
+  const mapRef = useRef(null);
+
   const [location, setLocation] = useState({
     latitude: -6.778267750927057,
     longitude: -79.84472684077221,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+
   const [origin, setOrigin] = useState({
     latitude: -6.7793364545583845,
     longitude: -79.83944788239306,
   });
+
   const darkMapStyle = [
     {
       elementType: "geometry",
@@ -161,9 +172,6 @@ export default function App() {
       ],
     },
   ];
-  // Referencia al MapView para centrar el mapa
-  const mapRef = useRef(null);
-  const [address, setAddress] = useState(""); // Estado para almacenar la dirección]
 
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -205,14 +213,43 @@ export default function App() {
       alert("Permission to access location was denied");
     }
   };
-  const [panelOpen, setPanelOpen] = useState(false); // Estado para controlar si el panel está abierto o cerrado
+
   const handleMenuClick = (e) => {
     e.stopPropagation(); // Evitar que el clic se propague al input
     setPanelOpen(!panelOpen);
   };
 
-  const route = useRouter();
+  const fetchNearbyPlaces = async () => {
+    try {
+      const { latitude, longitude } = location;
+      const radius = 1000; // Radio de búsqueda (en metros)
+      const placesTypes = ["hospital", "police", "pharmacy"]; // Tipos de lugares que deseas buscar
+      let allPlaces = [];
 
+      for (const type of placesTypes) {
+        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${GOOGLE_MAPS_API_KEY}`;
+
+        const response = await axios.get(url);
+        allPlaces = [...allPlaces, ...response.data.results];
+      }
+
+      setPlaces(allPlaces);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getIconForPlace = (place) => {
+    // Asigna un ícono según el tipo de lugar
+    if (place.types.includes("hospital")) {
+      return require("../assets/hospital.png");
+    } else if (place.types.includes("police")) {
+      return require("../assets/policeman.png");
+    } else if (place.types.includes("pharmacy")) {
+      return require("../assets/medicine.png");
+    } else {
+      return require("../assets/marker.png");
+    }
+  };
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
   return (
     <View style={styles.container}>
@@ -224,6 +261,7 @@ export default function App() {
         customMapStyle={darkMapStyle}
         onPress={() => setPanelOpen(false)}
       >
+        {/* Mostrar marcador para la ubicación del usuario */}
         <Marker
           draggable
           coordinate={location}
@@ -231,16 +269,26 @@ export default function App() {
             setLocation(direction.nativeEvent.coordinate)
           }
         />
+
         <Marker
           draggable
           coordinate={origin}
           onDragEnd={(direction) => setOrigin(direction.nativeEvent.coordinate)}
         />
-        {/* <Polyline
-          coordinates={[location, origin]}
-          strokeColor="#31E981"
-          strokeWidth={2}
-        /> */}
+
+        {/* Mostrar los lugares cercanos en el mapa */}
+        {places.map((place) => (
+          <Marker
+            key={place.place_id}
+            coordinate={{
+              latitude: place.geometry.location.lat,
+              longitude: place.geometry.location.lng,
+            }}
+            title={place.name}
+            image={getIconForPlace(place)}
+          />
+        ))}
+
         <MapViewDirections
           origin={origin}
           destination={location}
@@ -303,6 +351,7 @@ export default function App() {
           style={[styles.botonesLeft, hoverChat && styles.botonHover]}
           onPressIn={() => setHoverChat(true)}
           onPressOut={() => setHoverChat(false)}
+          onPress={() => route.push("/chat")}
         >
           <Ionicons name="chatbubbles" size={30} color="#31E981" />
         </TouchableOpacity>
@@ -310,6 +359,7 @@ export default function App() {
           style={[styles.botonesLeft, hoverHomeSafe && styles.botonHover]}
           onPressIn={() => setHoverHomeSafe(true)}
           onPressOut={() => setHoverHomeSafe(false)}
+          onPress={fetchNearbyPlaces} // Llamar la función al presionar el botón
         >
           <FontAwesome6 name="house-lock" size={30} color="#31E981" />
         </TouchableOpacity>
