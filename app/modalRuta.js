@@ -1,12 +1,19 @@
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useState } from "react";
-import { Image, Text, TextInput, View, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  Image,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome"; // Importar FontAwesome
-
+import axios from "axios"; // Para hacer solicitudes HTTP
 const location = require("../assets/Location.png");
 const clock = require("../assets/Clock.png");
 const close = require("../assets/Close.png");
-export default function ModalRuta({ setOpenModal }) {
+export default function ModalRuta({ setOpenModal, setDestination }) {
   const [transportSelected, setTransportSelected] = useState("car"); // Estado para la selección del transporte
 
   // Función para manejar la selección de transporte
@@ -17,7 +24,73 @@ export default function ModalRuta({ setOpenModal }) {
       setTransportSelected(transport); // Marcar el ícono seleccionado
     }
   };
+  const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
+  const [suggestions, setSuggestions] = useState([]);
+  const [query, setQuery] = useState("");
+  const [latLng, setLatLng] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
 
+  // Función para obtener las sugerencias de Google Places
+  const getSuggestions = async (query) => {
+    if (query.length > 2) {
+      // Solo realizar la búsqueda si el texto tiene más de 2 caracteres
+      try {
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/place/autocomplete/json`,
+          {
+            params: {
+              input: query,
+              key: GOOGLE_MAPS_API_KEY,
+              language: "es", // Puedes ajustar el idioma de las sugerencias
+            },
+          }
+        );
+        setSuggestions(response.data.predictions); // Guardar las sugerencias
+      } catch (error) {
+        console.error("Error al obtener las sugerencias:", error);
+      }
+    } else {
+      setSuggestions([]); // Limpiar sugerencias si el campo de búsqueda está vacío o tiene menos de 3 caracteres
+    }
+  };
+
+  // Obtener las coordenadas del destino seleccionado usando la API de Geocoding
+  const getCoordinates = async (address) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json`,
+        {
+          params: {
+            address: address,
+            key: GOOGLE_MAPS_API_KEY,
+          },
+        }
+      );
+      const location = response.data.results[0]?.geometry?.location;
+      if (location) {
+        setLatLng({
+          latitude: location.lat,
+          longitude: location.lng,
+        }); // Establecer latitud y longitud del destino
+        setDestination({
+          latitude: location.lat,
+          longitude: location.lng,
+        }); // Pasar las coordenadas a la prop setDestination
+      }
+    } catch (error) {
+      console.error("Error al obtener las coordenadas:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (query) {
+      getSuggestions(query);
+    } else {
+      setSuggestions([]);
+    }
+  }, [query]);
   return (
     <View
       style={{
@@ -74,6 +147,7 @@ export default function ModalRuta({ setOpenModal }) {
           <Image source={location} style={{ width: 30, height: 30 }} />
           <TextInput
             placeholder="Dirección"
+            onChangeText={(text) => setQuery(text)}
             style={{
               borderColor: "white",
               backgroundColor: "white",
@@ -86,6 +160,39 @@ export default function ModalRuta({ setOpenModal }) {
             }}
           />
         </View>
+
+        {/* Mostrar las sugerencias de lugares si existen */}
+        {suggestions.length > 0 && (
+          <FlatList
+            data={suggestions}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setQuery(item.description); // Establecer la dirección seleccionada
+                  setSuggestions([]); // Limpiar sugerencias después de seleccionar
+                  getCoordinates(item.description); // Obtener las coordenadas del destino seleccionado
+                  setOpenModal(false); // Cerrar el modal
+                }}
+                style={{
+                  padding: 10,
+                  borderBottomColor: "#ccc",
+                  borderBottomWidth: 1,
+                }}
+              >
+                <Text style={{ color: "white" }}>{item.description}</Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.place_id}
+            style={{
+              width: "80%",
+              backgroundColor: "#00120B",
+              borderRadius: 10,
+              marginTop: 10,
+              maxHeight: 200, // Limitar la altura de la lista
+            }}
+          />
+        )}
+
         {/* Sección con íconos y botón */}
         <View
           style={{

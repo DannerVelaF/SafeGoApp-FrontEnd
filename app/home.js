@@ -41,7 +41,7 @@ export default function App() {
   const [address, setAddress] = useState(""); // Estado para almacenar la dirección]
   const [places, setPlaces] = useState([]);
   const [panelOpen, setPanelOpen] = useState(false); // Estado para controlar si el panel está abierto o cerrado]
-
+  const [alarmaActive, setAlarmaActive] = useState(false); // Estado para activar o desactivar la alarma
   const route = useRouter();
   // Referencia al MapView para centrar el mapa
   const mapRef = useRef(null);
@@ -53,9 +53,9 @@ export default function App() {
     longitudeDelta: 0.0421,
   });
 
-  const [origin, setOrigin] = useState({
-    latitude: -6.7793364545583845,
-    longitude: -79.83944788239306,
+  const [destination, setDestination] = useState({
+    latitude: 0,
+    longitude: 0,
   });
 
   const darkMapStyle = [
@@ -258,7 +258,6 @@ export default function App() {
   };
   const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
   const [openModal, setOpenModal] = useState(false);
-
   return (
     <View style={styles.container}>
       {GPSPress ? (
@@ -277,7 +276,12 @@ export default function App() {
         </Text>
       ) : null}
       <StatusBar backgroundColor="#000" />
-      {openModal ? <ModalRuta setOpenModal={setOpenModal} /> : null}
+      {openModal ? (
+        <ModalRuta
+          setOpenModal={setOpenModal}
+          setDestination={setDestination}
+        />
+      ) : null}
       <MapView
         ref={mapRef} // Asigna la referencia al MapView
         style={styles.map}
@@ -286,19 +290,8 @@ export default function App() {
         onPress={() => setPanelOpen(false)}
       >
         {/* Mostrar marcador para la ubicación del usuario */}
-        <Marker
-          draggable
-          coordinate={location}
-          onDragEnd={(direction) =>
-            setLocation(direction.nativeEvent.coordinate)
-          }
-        />
-
-        <Marker
-          draggable
-          coordinate={origin}
-          onDragEnd={(direction) => setOrigin(direction.nativeEvent.coordinate)}
-        />
+        <Marker coordinate={location} />
+        <Marker coordinate={destination} />
 
         {/* Mostrar los lugares cercanos en el mapa */}
         {places.map((place) => (
@@ -313,13 +306,15 @@ export default function App() {
           />
         ))}
 
-        <MapViewDirections
-          origin={origin}
-          destination={location}
-          apikey={GOOGLE_MAPS_API_KEY}
-          strokeColor="#31E981"
-          strokeWidth={2}
-        />
+        {destination.latitude !== 0 && destination.longitude !== 0 && (
+          <MapViewDirections
+            origin={location} // Coordenada de origen
+            destination={destination}
+            apikey={GOOGLE_MAPS_API_KEY}
+            strokeColor="#31E981"
+            strokeWidth={2}
+          />
+        )}
       </MapView>
       <Panel isOpen={panelOpen} togglePanel={() => setPanelOpen(!panelOpen)} />
 

@@ -15,6 +15,9 @@ const imagen2 = require("../assets/tutorial/2.png");
 const imagen3 = require("../assets/tutorial/3.png");
 const imagen4 = require("../assets/tutorial/4.png");
 const imagen5 = require("../assets/tutorial/5.png");
+const imagen6 = require("../assets/tutorial/6.png");
+const imagen7 = require("../assets/tutorial/7.png");
+
 const puntoHueco = require("../assets/tutorial/puntoHueco.png");
 const puntoLleno = require("../assets/tutorial/puntoLleno.png");
 
@@ -24,7 +27,15 @@ export default function Tutorial() {
   const router = useRouter();
 
   // Lista de imágenes
-  const imagenes = [imagen1, imagen2, imagen3, imagen4, imagen5];
+  const imagenes = [
+    imagen1,
+    imagen2,
+    imagen3,
+    imagen4,
+    imagen5,
+    imagen6,
+    // imagen7,
+  ];
 
   // Función para ir a la siguiente imagen
   const siguienteImagen = () => {
@@ -97,7 +108,7 @@ export default function Tutorial() {
           style={{
             position: "absolute",
             bottom: 10,
-            left: "50%",
+            left: "45%",
             transform: [{ translateX: -50 }],
             flexDirection: "row",
           }}
