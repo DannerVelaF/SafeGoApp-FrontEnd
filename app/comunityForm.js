@@ -112,6 +112,11 @@ export default function CommunityForm() {
     }
   };
   const { userData } = useUserStore();
+  useEffect(() => {
+    if (userData === null) {
+      route.push("/loginScreen");
+    }
+  }, []);
   const { token, user } = userData;
 
   const handleSubmit = async () => {
@@ -143,8 +148,9 @@ export default function CommunityForm() {
       console.error("Error al crear la localidad:", error);
     }
   };
-  
+
   const router = useRouter();
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1, marginVertical: 50, marginHorizontal: 30 }}>

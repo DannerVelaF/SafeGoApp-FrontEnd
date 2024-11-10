@@ -12,6 +12,12 @@ const Instagram = require("../assets/Instagram.png");
 const Tiktok = require("../assets/TikTok.png");
 
 export default function Panel({ isOpen, togglePanel }) {
+  const { userData, clearUser } = useUserStore();
+  useEffect(() => {
+    if (userData === null) {
+      router.push("/loginScreen");
+    }
+  }, []);
   const [selectedIndex, setSelectedIndex] = useState(null); // Estado para la opción seleccionada
   const router = useRouter(); // Instanciamos el hook useRouter
   const opts = [
@@ -27,8 +33,6 @@ export default function Panel({ isOpen, togglePanel }) {
     setSelectedIndex(index); // Actualiza el índice de la opción seleccionada
     router.push(route); // Navega a la ruta seleccionada usando Expo Router
   };
-
-  const { clearUser } = useUserStore();
 
   return (
     <View style={[styles.container, isOpen ? styles.containerOpen : null]}>

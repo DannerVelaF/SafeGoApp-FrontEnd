@@ -21,7 +21,7 @@ const imagen6 = require("../assets/tutorial/6.png");
 const puntoHueco = require("../assets/tutorial/puntoHueco.png");
 const puntoLleno = require("../assets/tutorial/puntoLleno.png");
 
-import { BlurView } from "expo-blur"; // Importamos BlurView
+import { useUserStore } from "../store/store";
 
 export default function Tutorial() {
   const [imagen, setImagen] = useState(imagen1); // Inicializamos con la primera imagen
@@ -38,7 +38,12 @@ export default function Tutorial() {
     imagen6,
     // imagen7,
   ];
-
+  const { userData } = useUserStore();
+  useEffect(() => {
+    if (userData === null) {
+      route.push("/loginScreen");
+    }
+  }, []);
   // Función para ir a la siguiente imagen
   const siguienteImagen = () => {
     if (indiceImagen < imagenes.length - 1) {

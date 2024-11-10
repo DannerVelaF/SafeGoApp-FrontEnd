@@ -122,6 +122,11 @@ export default function Community() {
       console.error("Error al obtener los datos:", error);
     }
   };
+  useEffect(() => {
+    if (userData === null) {
+      route.push("/loginScreen");
+    }
+  }, []);
 
   useEffect(() => {
     getData();

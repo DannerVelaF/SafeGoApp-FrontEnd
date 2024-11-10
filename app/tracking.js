@@ -1,11 +1,17 @@
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useUserStore } from "../store/store";
 
 const back = require("../assets/BackArrow.png");
 export default function Seguimiento() {
   const router = useRouter();
-
+  const { userData } = useUserStore();
+  useEffect(() => {
+    if (userData === null) {
+      route.push("/loginScreen");
+    }
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: 33, paddingVertical: 43 }}>

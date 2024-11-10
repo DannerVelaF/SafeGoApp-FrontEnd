@@ -69,10 +69,15 @@ export default function RegisterScreen() {
       );
     }
   };
-
+  const { userData } = useUserStore();
+  useEffect(() => {
+    if (userData !== null) {
+      router.push("/home");
+    }
+  }, [userData]);
   return (
     <View style={styles.container}>
-      <StatusBar animated={true}  backgroundColor="#00120B"  barStyle="dark" />
+      <StatusBar animated={true} backgroundColor="#00120B" barStyle="dark" />
       <View style={styles.loginBox}>
         <Text style={styles.title}>Registrarse</Text>
         <Text style={styles.subtitle}>Ingresa tus datos</Text>
@@ -141,19 +146,14 @@ export default function RegisterScreen() {
           />
         </View>
 
-          <View style={styles.singleInput}>
-            <FontAwesome
-              name="user"
-              size={20}
-              color="#666"
-              style={styles.icon}
-            />
+        <View style={styles.singleInput}>
+          <FontAwesome name="user" size={20} color="#666" style={styles.icon} />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Usuario"
-              onChangeText={(text) => setData({ ...data, username: text })}
-            />
+          <TextInput
+            style={styles.input}
+            placeholder="Usuario"
+            onChangeText={(text) => setData({ ...data, username: text })}
+          />
         </View>
 
         <View style={styles.singleInput}>

@@ -1,5 +1,5 @@
 // src/LoginScreen.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,11 @@ export default function LoginScreen() {
   });
 
   const { setUser, userData } = useUserStore();
-
+  useEffect(() => {
+    if (userData !== null) {
+      router.push("/home");
+    }
+  }, [userData]);
   const handleSubmit = async () => {
     if (!data.username || !data.password) {
       alert("Por favor, complete todos los campos.");
@@ -51,7 +55,7 @@ export default function LoginScreen() {
       source={require("../assets/Login.png")}
       style={styles.background}
     >
-      <StatusBar animated={true}  backgroundColor="#00120B"  barStyle="dark" />
+      <StatusBar animated={true} backgroundColor="#00120B" barStyle="dark" />
       <View style={styles.container}>
         <View style={styles.loginBox}>
           <Text style={styles.title}>Iniciar Sesión</Text>

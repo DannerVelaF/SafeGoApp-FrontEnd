@@ -13,6 +13,7 @@ import * as Contacts from "expo-contacts";
 import * as Linking from "expo-linking"; // Importamos Linking
 import { FontAwesome, FontAwesome6, Ionicons } from "@expo/vector-icons"; // Para los iconos
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUserStore } from "../store/store";
 
 const back = require("../assets/BackArrow.png");
 const marker = require("../assets/marker.png");
@@ -274,7 +275,12 @@ export default function Emergency() {
     </View>
   );
 }
-
+const { userData } = useUserStore();
+useEffect(() => {
+  if (userData === null) {
+    route.push("/loginScreen");
+  }
+}, []);
 const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",

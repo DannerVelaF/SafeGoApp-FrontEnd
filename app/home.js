@@ -261,6 +261,13 @@ export default function App() {
   const [openModal, setOpenModal] = useState(false);
   const [vehicleType, setVehicleType] = useState("car");
 
+  const { userData } = useUserStore();
+  useEffect(() => {
+    if (userData === null) {
+      route.push("/loginScreen");
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       {GPSPress ? (

@@ -75,6 +75,13 @@ export default function NewsInterface() {
   }, []);
 
   const { userData } = useUserStore();
+
+  useEffect(() => {
+    if (userData === null) {
+      route.push("/loginScreen");
+    }
+  }, []);
+
   const { token } = userData;
 
   useEffect(() => {
