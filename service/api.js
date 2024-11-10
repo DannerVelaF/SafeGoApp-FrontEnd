@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Crea la instancia de axios
 const api = axios.create({
-  baseURL: "http://192.168.1.12:8081/",
+  baseURL: "http://192.168.101.4:8080/",
 });
 
 const registerUser = async (userData) => {
