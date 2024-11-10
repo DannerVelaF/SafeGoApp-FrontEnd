@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,16 @@ import {
   StyleSheet,
   Dimensions,
   ImageBackground,
-} from 'react-native';
-import { SelectList } from 'react-native-dropdown-select-list';
+  ActivityIndicator,
+} from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
-import * as Location from 'expo-location';
-const hackaton = require('../assets/hackaton.png');
+import { useRouter } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import api from "../service/api";
+import { useUserStore } from "../store/store";
+const hackaton = require("../assets/hackaton.png");
 
 export default function NewsInterface() {
   const [location, setLocation] = useState({
@@ -24,21 +27,23 @@ export default function NewsInterface() {
     address: "", // Dirección solo con la ciudad
   });
   const [direccion, setDireccion] = useState("");
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [news, setNews] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Estado de carga
 
   const locations = [
-    { key: '1', value: 'San Isidro ' },
-    { key: '2', value: 'Miraflores ' },
-    { key: '3', value: 'Surco ' },
-    { key: '4', value: 'San Borja ' },
-    { key: '5', value: 'Chiclayo ' },
+    { key: "san-isidro", value: "San Isidro " },
+    { key: "miraflores", value: "Miraflores " },
+    { key: "surco", value: "Surco " },
+    { key: "san-borja", value: "San Borja " },
+    { key: "chiclayo", value: "Chiclayo " },
+    { key: "lima", value: "Lima" },
   ];
 
   // Obtener la ubicación del usuario y obtener la ciudad
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setErrorMsg('Permission to access location was denied');
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
       return;
     }
 
@@ -69,31 +74,46 @@ export default function NewsInterface() {
     getLocationAsync();
   }, []);
 
-  const NewsCard = () => (
+  const { userData } = useUserStore();
+  const { token } = userData;
+
+  useEffect(() => {
+    if (direccion) {
+      getNews(direccion.trim().toLowerCase());
+    }
+  }, [direccion]); // Llama a getNews cuando dirección esté lista
+  0;
+  const getNews = async (locationAddress) => {
+    try {
+      setIsLoading(true); // Comienza la carga
+      const response = await api.consultarNoticias(token, locationAddress);
+      setNews(response);
+    } catch (error) {
+      console.error("Error al obtener las noticias:", error);
+    } finally {
+      setIsLoading(false); // Finaliza la carga
+    }
+  };
+
+  const handleDropdownChange = (selectedLocation) => {
+    setDireccion(selectedLocation);
+    setLocation((prevState) => ({
+      ...prevState,
+      address: selectedLocation,
+    }));
+    getNews(selectedLocation.trim().toLowerCase()); // Llamar a getNews con la nueva ubicación
+  };
+
+  const NewsCard = ({ title, description, imageUrl, date }) => (
     <View style={styles.card}>
-      <Image
-        source={hackaton}
-        style={styles.cardImage}
-      />
+      <Image source={{ uri: imageUrl }} style={styles.cardImage} />
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>
-          Descubrimiento científico revolucionario
-        </Text>
-        <Text style={styles.cardSubtitle}>
-          Científicos logran un avance significo
-        </Text>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardSubtitle}>{description}</Text>
         <View style={styles.cardMetrics}>
           <View style={styles.metric}>
             <Feather name="clock" size={12} color="#666" />
-            <Text style={styles.metricText}>Hace 2 horas </Text>
-          </View>
-          <View style={styles.metric}>
-            <Feather name="share-2" size={12} color="#666" />
-            <Text style={styles.metricText}>234 </Text>
-          </View>
-          <View style={styles.metric}>
-            <Feather name="heart" size={12} color="#666" />
-            <Text style={styles.metricText}>56 </Text>
+            <Text style={styles.metricText}>{date}</Text>
           </View>
         </View>
       </View>
@@ -121,7 +141,7 @@ export default function NewsInterface() {
 
         <View style={styles.logoContainer}>
           <ImageBackground
-            source={require('../assets/ElComercio.png')}
+            source={require("../assets/ElComercio.png")}
             style={styles.logo}
           />
         </View>
@@ -129,15 +149,15 @@ export default function NewsInterface() {
 
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar noticias"
-          />
+          <TextInput style={styles.searchInput} placeholder="Buscar noticias" />
           <View style={styles.dropdown}>
             <SelectList
-              setSelected={(val) => console.log(val)}
+              setSelected={handleDropdownChange}
               data={locations}
-              defaultOption={locations.find(loc => loc.value.trim() === direccion) || locations[0]}
+              defaultOption={
+                locations.find((loc) => loc.value.trim() === direccion) ||
+                locations[0]
+              }
               search={false}
               boxStyles={styles.selectBox}
               inputStyles={styles.selectText}
@@ -146,22 +166,35 @@ export default function NewsInterface() {
         </View>
       </View>
 
-      {/* Featured News */}
-      <View style={styles.featuredContainer}>
-        <Image
-          source={hackaton}
-          style={styles.featuredImage}
-        />
-      </View>
-
-      <View style={styles.newsSection}>
-        <Text style={styles.sectionTitle}>Noticias Destacadas</Text>
-        <View style={styles.newsGrid}>
-          {[1, 2, 3, 4].map((item) => (
-            <NewsCard key={item} />
-          ))}
+      {/* Indicador de carga */}
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text style={styles.loadingText}>Cargando noticias...</Text>
         </View>
-      </View>
+      ) : (
+        <View>
+          {/* Featured News */}
+          <View style={styles.featuredContainer}>
+            <Image source={hackaton} style={styles.featuredImage} />
+          </View>
+
+          <View style={styles.newsSection}>
+            <Text style={styles.sectionTitle}>Noticias Destacadas</Text>
+            <View style={styles.newsGrid}>
+              {news.map((item, index) => (
+                <NewsCard
+                  key={index}
+                  title={item.title}
+                  description={item.description}
+                  imageUrl={item.imageUrl}
+                  date={item.date}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -180,34 +213,34 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 16,
   },
   headerTitle: {
     marginLeft: 16,
     fontSize: 24,
-    fontWeight: 'bold',
-    fontFamily: 'serif',
+    fontWeight: "bold",
+    fontFamily: "serif",
   },
   searchContainer: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   searchBar: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   searchInput: {
     flex: 1,
     height: 40,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     paddingHorizontal: 12,
   },
@@ -226,11 +259,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   featuredImage: {
-    width: '100%',
+    width: "100%",
     height: 170,
     borderRadius: 20,
-    overflow: 'hidden',
-    resizeMode: 'cover', // Cambia a 'cover' si prefieres este ajuste
+    overflow: "hidden",
+    resizeMode: "cover", // Cambia a 'cover' si prefieres este ajuste
     borderWidth: 2, // Añade esta línea para el ancho del borde
   },
   newsSection: {
@@ -238,24 +271,24 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
   },
   newsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 16,
   },
   card: {
-    width: (Dimensions.get('window').width - 48) / 2,
-    backgroundColor: '#fff',
+    width: (Dimensions.get("window").width - 48) / 2,
+    backgroundColor: "#fff",
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: "#eee",
   },
   cardImage: {
-    width: '100%',
+    width: "100%",
     height: 120,
   },
   cardContent: {
@@ -263,25 +296,25 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginBottom: 8,
   },
   cardMetrics: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   metric: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   metricText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
 });
