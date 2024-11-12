@@ -23,12 +23,7 @@ export default function Inbox({ chatId }) {
     },
   ];
   const chatSeleccionado = DATA.find((chat) => chat.id === chatId);
-  const { userData } = useUserStore();
-  useEffect(() => {
-    if (userData === null) {
-      route.push("/loginScreen");
-    }
-  }, []);
+
   return (
     <View
       style={{

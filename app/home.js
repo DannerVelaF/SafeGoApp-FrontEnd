@@ -294,7 +294,6 @@ export default function App() {
           setVehicleType={setVehicleType}
           destination={destination}
           location={location}
-          setDuration={setDuration}
         />
       ) : null}
 
@@ -306,7 +305,13 @@ export default function App() {
         onPress={() => setPanelOpen(false)}
       >
         {/* Mostrar marcador para la ubicación del usuario */}
-        <Marker coordinate={location} />
+        <Marker
+          coordinate={location}
+          draggable
+          onDragEnd={(e) => {
+            setLocation(e.nativeEvent.coordinate);
+          }}
+        />
         <Marker coordinate={destination} />
 
         {/* Mostrar los lugares cercanos en el mapa */}

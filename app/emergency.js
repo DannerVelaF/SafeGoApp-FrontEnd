@@ -275,12 +275,7 @@ export default function Emergency() {
     </View>
   );
 }
-const { userData } = useUserStore();
-useEffect(() => {
-  if (userData === null) {
-    route.push("/loginScreen");
-  }
-}, []);
+
 const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",

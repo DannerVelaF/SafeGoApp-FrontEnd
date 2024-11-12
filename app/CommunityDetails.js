@@ -203,8 +203,9 @@ export default function CommunityDetail({ communityId, data }) {
               gap: 13,
             }}
           >
-            {contactos.map((contacto) => (
+            {contactos.map((contacto, index) => (
               <View
+                key={index}
                 style={{
                   backgroundColor: "#fff",
                   display: "flex",

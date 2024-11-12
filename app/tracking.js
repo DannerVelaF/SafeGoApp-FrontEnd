@@ -2,7 +2,7 @@ import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useUserStore } from "../store/store";
-
+import { useEffect } from "react";
 const back = require("../assets/BackArrow.png");
 export default function Seguimiento() {
   const router = useRouter();

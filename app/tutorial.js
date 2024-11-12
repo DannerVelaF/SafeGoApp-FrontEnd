@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
   StatusBar,
@@ -17,7 +17,6 @@ const imagen4 = require("../assets/tutorial/4.png");
 const imagen5 = require("../assets/tutorial/5.png");
 const imagen6 = require("../assets/tutorial/6.png");
 // const imagen7 = require("../assets/tutorial/7.png");
-
 const puntoHueco = require("../assets/tutorial/puntoHueco.png");
 const puntoLleno = require("../assets/tutorial/puntoLleno.png");
 
