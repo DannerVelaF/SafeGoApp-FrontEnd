@@ -29,7 +29,6 @@ import { useRouter } from "expo-router";
 import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
 import ModalRuta from "./modalRuta";
-import calculateDuration from "../service/calculatedTime";
 
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
