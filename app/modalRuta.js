@@ -10,8 +10,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome"; // Importar FontAwesome
 import axios from "axios"; // Para hacer solicitudes HTTP
-import calculateDuration from "../service/calculatedTime";
-const location = require("../assets/Location.png");
+const markerIcon = require("../assets/Location.png");
 const clock = require("../assets/Clock.png");
 const close = require("../assets/Close.png");
 export default function ModalRuta({
@@ -19,7 +18,6 @@ export default function ModalRuta({
   setDestination,
   vehicleType,
   setVehicleType,
-
   location,
 }) {
   // Función para manejar la selección de transporte
@@ -84,7 +82,6 @@ export default function ModalRuta({
           latitude: location.lat,
           longitude: location.lng,
         }); // Pasar las coordenadas a la prop setDestination
-        
       }
     } catch (error) {
       console.error("Error al obtener las coordenadas:", error);
@@ -151,7 +148,7 @@ export default function ModalRuta({
             marginBottom: 20,
           }}
         >
-          <Image source={location} style={{ width: 30, height: 30 }} />
+          <Image source={markerIcon} style={{ width: 30, height: 30 }} />
           <TextInput
             placeholder="Dirección"
             onChangeText={(text) => setQuery(text)}
@@ -162,7 +159,7 @@ export default function ModalRuta({
               fontSize: 12,
               borderRadius: 10,
               paddingHorizontal: 5,
-              paddingVertical: 2,
+              paddingVertical: 5,
               width: "80%",
             }}
           />

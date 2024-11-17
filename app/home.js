@@ -7,6 +7,7 @@ import {
   View,
   TouchableOpacity,
   StatusBar,
+  FlatList,
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
@@ -14,12 +15,8 @@ import MapView, { Marker } from "react-native-maps";
 const icon = require("../assets/safegoIcon.png");
 const menu = require("../assets/Menu.png");
 const search = require("../assets/Search.png");
-const Indicaciones = require("../assets/Indicaciones.png");
-const GPS = require("../assets/GPS.png");
-const Star = require("../assets/Star.png");
-const Chat = require("../assets/Chat.png");
-const HomeSafe = require("../assets/HomeSafe.png");
 const Siren = require("../assets/Siren.png");
+
 import Panel from "./panel";
 import { FontAwesome } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -29,7 +26,9 @@ import { useRouter } from "expo-router";
 import MapViewDirections from "react-native-maps-directions";
 import axios from "axios";
 import ModalRuta from "./modalRuta";
-
+import GPSAlert from "../components/gpsAlert";
+import darkMapStyle from "../util/darkMapStyle";
+import Map from "../components/map";
 export default function App() {
   const [hoverGPS, setHoverGPS] = useState(false);
   const [hoverIndicaciones, setHoverIndicaciones] = useState(false);
@@ -41,7 +40,6 @@ export default function App() {
   const [address, setAddress] = useState(""); // Estado para almacenar la dirección]
   const [places, setPlaces] = useState([]);
   const [panelOpen, setPanelOpen] = useState(false); // Estado para controlar si el panel está abierto o cerrado]
-  const [alarmaActive, setAlarmaActive] = useState(false); // Estado para activar o desactivar la alarma
   const route = useRouter();
   // Referencia al MapView para centrar el mapa
   const mapRef = useRef(null);
@@ -58,122 +56,9 @@ export default function App() {
     longitude: 0,
   });
 
-  const darkMapStyle = [
-    {
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#212121",
-        },
-      ],
-    },
-    {
-      elementType: "labels.icon",
-      stylers: [
-        {
-          visibility: "off",
-        },
-      ],
-    },
-    {
-      elementType: "labels.text.fill",
-      stylers: [
-        {
-          color: "#757575",
-        },
-      ],
-    },
-    {
-      elementType: "labels.text.stroke",
-      stylers: [
-        {
-          color: "#212121",
-        },
-      ],
-    },
-    {
-      featureType: "administrative",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#757575",
-        },
-      ],
-    },
-    {
-      featureType: "poi",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#212121",
-        },
-      ],
-    },
-    {
-      featureType: "poi",
-      elementType: "labels.text.fill",
-      stylers: [
-        {
-          color: "#757575",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.fill",
-      stylers: [
-        {
-          color: "#2c2c2c",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.stroke",
-      stylers: [
-        {
-          color: "#212121",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "labels.text.fill",
-      stylers: [
-        {
-          color: "#757575",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "labels.text.stroke",
-      stylers: [
-        {
-          color: "#212121",
-        },
-      ],
-    },
-    {
-      featureType: "water",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#000000",
-        },
-      ],
-    },
-    {
-      featureType: "water",
-      elementType: "labels.text.fill",
-      stylers: [
-        {
-          color: "#3d3d3d",
-        },
-      ],
-    },
-  ];
   const [GPSPress, setGPSPress] = useState(false);
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -225,6 +110,60 @@ export default function App() {
     setPanelOpen(!panelOpen);
   };
 
+  const getSuggestions = async (query) => {
+    if (query.length > 2) {
+      // Solo realizar la búsqueda si el texto tiene más de 2 caracteres
+      try {
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/place/autocomplete/json`,
+          {
+            params: {
+              input: query,
+              key: GOOGLE_MAPS_API_KEY,
+              language: "es", // Puedes ajustar el idioma de las sugerencias
+            },
+          }
+        );
+        setSuggestions(response.data.predictions); // Guardar las sugerencias
+      } catch (error) {
+        console.error("Error al obtener las sugerencias:", error);
+      }
+    } else {
+      setSuggestions([]); // Limpiar sugerencias si el campo de búsqueda está vacío o tiene menos de 3 caracteres
+    }
+  };
+
+  const getCoordinates = async (address) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json`,
+        {
+          params: {
+            address: address,
+            key: GOOGLE_MAPS_API_KEY,
+          },
+        }
+      );
+      const location = response.data.results[0]?.geometry?.location;
+      if (location) {
+        setDestination({
+          latitude: location.lat,
+          longitude: location.lng,
+        }); // Pasar las coordenadas a la prop setDestination
+      }
+    } catch (error) {
+      alert("Error al obtener las coordenadas:", error);
+    }
+  };
+  useEffect(() => {
+    if (query) {
+      getSuggestions(query);
+    } else {
+      setSuggestions([]);
+    }
+  }, [query]);
+  const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
+
   const fetchNearbyPlaces = async () => {
     try {
       const { latitude, longitude } = location;
@@ -244,46 +183,28 @@ export default function App() {
       console.error(error);
     }
   };
-  const getIconForPlace = (place) => {
-    // Asigna un ícono según el tipo de lugar
-    if (place.types.includes("hospital")) {
-      return require("../assets/hospital.png"); // o una URL
-    } else if (place.types.includes("police")) {
-      return require("../assets/policeman.png"); // o una URL
-    } else if (place.types.includes("pharmacy")) {
-      return require("../assets/medicine.png"); // o una URL
-    } else {
-      return require("../assets/default.png"); // Ícono por defecto si no se encuentra tipo específico
-    }
-  };
-  const GOOGLE_MAPS_API_KEY = "AIzaSyD4ZYfbcWceAE9FEXWU4pBq-K4Ys9s0idM";
+
   const [openModal, setOpenModal] = useState(false);
   const [vehicleType, setVehicleType] = useState("car");
 
   const { userData } = useUserStore();
   useEffect(() => {
+    getLocationAsync();
     if (userData === null) {
       route.push("/loginScreen");
     }
   }, []);
 
+  const [keyboardView, setKeyboardView] = useState(true);
+  useEffect(() => {
+    if (keyboardView) {
+      setSuggestions([]);
+    }
+  }, [keyboardView]);
+
   return (
     <View style={styles.container}>
-      {GPSPress ? (
-        <Text
-          style={{
-            backgroundColor: "#FFFFFF",
-            zIndex: 10,
-            position: "absolute",
-            bottom: 150,
-            paddingHorizontal: 10,
-            paddingVertical: 5,
-            borderRadius: 10,
-          }}
-        >
-          Se actualizo la ubicación de tu dispositivo.
-        </Text>
-      ) : null}
+      {GPSPress ? <GPSAlert /> : null}
       <StatusBar backgroundColor="#000" />
       {openModal ? (
         <ModalRuta
@@ -296,51 +217,19 @@ export default function App() {
         />
       ) : null}
 
-      <MapView
-        ref={mapRef} // Asigna la referencia al MapView
-        style={styles.map}
-        initialRegion={location}
-        customMapStyle={darkMapStyle}
-        onPress={() => setPanelOpen(false)}
-      >
-        {/* Mostrar marcador para la ubicación del usuario */}
-        <Marker
-          coordinate={location}
-          draggable
-          onDragEnd={(e) => {
-            setLocation(e.nativeEvent.coordinate);
-          }}
-        />
-        <Marker coordinate={destination} />
-
-        {/* Mostrar los lugares cercanos en el mapa */}
-        {places.map((place) => (
-          <Marker
-            key={place.place_id}
-            coordinate={{
-              latitude: place.geometry.location.lat,
-              longitude: place.geometry.location.lng,
-            }}
-            title={place.name}
-            image={getIconForPlace(place)}
-          />
-        ))}
-
-        {destination.latitude !== 0 && destination.longitude !== 0 && (
-          <MapViewDirections
-            origin={location} // Coordenada de origen
-            destination={destination}
-            apikey={GOOGLE_MAPS_API_KEY}
-            strokeColor="#31E981"
-            strokeWidth={2}
-          />
-        )}
-      </MapView>
+      <Map
+        places={places}
+        destination={destination}
+        location={location}
+        setLocation={setLocation}
+        mapRef={mapRef}
+        setPanelOpen={setPanelOpen}
+      />
       <Panel isOpen={panelOpen} togglePanel={() => setPanelOpen(!panelOpen)} />
 
       <View style={styles.header} id="Search bar">
-        <Image source={icon} style={styles.icon} />
         <View style={styles.inputContainer}>
+          <Image source={icon} style={styles.icon} />
           <TouchableOpacity
             style={styles.menuboxleft}
             onPress={handleMenuClick} // Abrir o cerrar el menú al hacer clic
@@ -350,80 +239,136 @@ export default function App() {
           <TextInput
             placeholder="Ingresa una dirección"
             style={styles.buscadorDireccion}
+            onFocus={() => setKeyboardView(false)}
+            onBlur={() => setKeyboardView(true)}
+            onChangeText={(text) => setQuery(text)}
           />
           <Image source={search} style={styles.menuIconRight} />
         </View>
       </View>
+      {/* Mostrar las sugerencias de lugares si existen */}
+
+      <View
+        style={{
+          position: "absolute",
+          width: "100%",
+          top: 80,
+          zIndex: 10,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {suggestions.length > 0 && (
+          <FlatList
+            data={suggestions}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setQuery(item.description); // Establecer la dirección seleccionada
+                  setSuggestions([]); // Limpiar sugerencias después de seleccionar
+                  getCoordinates(item.description); // Obtener las coordenadas del destino seleccionado
+                  setOpenModal(false); // Cerrar el modal
+                }}
+                style={{
+                  padding: 10,
+                  backgroundColor: "white",
+                  borderBottomColor: "#ccc",
+                }}
+              >
+                <Text style={{ color: "black" }}>{item.description}</Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.place_id}
+            style={{
+              width: "80%",
+              backgroundColor: "#00120B",
+              borderRadius: 10,
+              marginTop: 10,
+              maxHeight: 200, // Limitar la altura de la lista
+            }}
+          />
+        )}
+      </View>
       <View style={styles.locationContainer}>
         <Text style={styles.locationText}>
-          Ubicado en:{" "}
+          <Text
+            style={{
+              color: "#31E981",
+              fontWeight: "bold",
+              fontSize: 12,
+            }}
+          >
+            Ubicado en:
+          </Text>{" "}
           {address ? address : `${location.latitude}, ${location.longitude}`}
         </Text>
       </View>
 
-      <View style={styles.buttonContainerLeft}>
-        <TouchableOpacity
-          style={[styles.botonesLeft, hoverGPS && styles.botonHover]}
-          onPressIn={() => setHoverGPS(true)}
-          onPressOut={() => setHoverGPS(false)}
-          onPress={getLocationAsync} // Ejecutar la función al presionar el botón
-        >
-          <Ionicons name="locate-sharp" size={30} color="#31E981" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.botonesLeft, hoverIndicaciones && styles.botonHover]}
-          onPressIn={() => setHoverIndicaciones(true)}
-          onPressOut={() => setHoverIndicaciones(false)}
-          onPress={() => setOpenModal(true)}
-        >
-          <FontAwesome6 name="road" size={30} color="#31E981" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.buttonContainerRight}>
-        <TouchableOpacity
-          style={[styles.botonesLeft, hoverStar && styles.botonHover]}
-          onPressIn={() => setHoverStar(true)}
-          onPressOut={() => setHoverStar(false)}
-        >
-          <FontAwesome name="star" size={30} color="#31E981" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.botonesLeft, hoverChat && styles.botonHover]}
-          onPressIn={() => setHoverChat(true)}
-          onPressOut={() => setHoverChat(false)}
-          onPress={() => route.push("/chat")}
-        >
-          <Ionicons name="chatbubbles" size={30} color="#31E981" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.botonesLeft, hoverHomeSafe && styles.botonHover]}
-          onPressIn={() => setHoverHomeSafe(true)}
-          onPressOut={() => setHoverHomeSafe(false)}
-          onPress={fetchNearbyPlaces} // Llamar la función al presionar el botón
-        >
-          <FontAwesome6 name="house-lock" size={30} color="#31E981" />
-        </TouchableOpacity>
-      </View>
-      <View style={[styles.sirenButton, hoverSiren && styles.sirenButtonHover]}>
-        <TouchableOpacity
-          onPressIn={() => setHoverSiren(true)}
-          onPressOut={() => setHoverSiren(false)}
-        >
-          <Image source={Siren} style={styles.iconSize} />
-        </TouchableOpacity>
-      </View>
+      {keyboardView ? (
+        <>
+          <View style={styles.buttonContainerLeft}>
+            <TouchableOpacity
+              style={[styles.botonesLeft, hoverGPS && styles.botonHover]}
+              onPressIn={() => setHoverGPS(true)}
+              onPressOut={() => setHoverGPS(false)}
+              onPress={getLocationAsync} // Ejecutar la función al presionar el botón
+            >
+              <Ionicons name="locate-sharp" size={30} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.botonesLeft,
+                hoverIndicaciones && styles.botonHover,
+              ]}
+              onPressIn={() => setHoverIndicaciones(true)}
+              onPressOut={() => setHoverIndicaciones(false)}
+              onPress={() => setOpenModal(true)}
+            >
+              <FontAwesome6 name="road" size={30} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.buttonContainerRight}>
+            <TouchableOpacity
+              style={[styles.botonesLeft, hoverStar && styles.botonHover]}
+              onPressIn={() => setHoverStar(true)}
+              onPressOut={() => setHoverStar(false)}
+            >
+              <FontAwesome name="star" size={30} color="#31E981" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.botonesLeft, hoverChat && styles.botonHover]}
+              onPressIn={() => setHoverChat(true)}
+              onPressOut={() => setHoverChat(false)}
+              onPress={() => route.push("/chat")}
+            >
+              <Ionicons name="chatbubbles" size={30} color="#31E981" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.botonesLeft, hoverHomeSafe && styles.botonHover]}
+              onPressIn={() => setHoverHomeSafe(true)}
+              onPressOut={() => setHoverHomeSafe(false)}
+              onPress={fetchNearbyPlaces} // Llamar la función al presionar el botón
+            >
+              <FontAwesome6 name="house-lock" size={30} color="#31E981" />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={[styles.sirenButton, hoverSiren && styles.sirenButtonHover]}
+          >
+            <TouchableOpacity
+              onPressIn={() => setHoverSiren(true)}
+              onPressOut={() => setHoverSiren(false)}
+            >
+              <Image source={Siren} style={styles.iconSize} />
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  map: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -434,52 +379,42 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
-    marginTop: 57,
-    paddingHorizontal: 16,
+    marginTop: 27,
+    paddingHorizontal: 20,
   },
   icon: {
-    width: 48,
-    height: 48,
+    width: 35,
+    height: 35,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    zIndex: 10,
+
     flex: 1,
-    position: "relative",
+    gap: 16,
+    backgroundColor: "white",
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    borderColor: "#000",
+    borderWidth: 1,
   },
   menuIconLeft: {
     width: 20,
     height: 20,
-    position: "absolute",
-    left: 10,
     zIndex: 10,
   },
-  menuboxleft: {
-    width: "15%",
-    height: "100%",
-    position: "absolute",
-    left: 10,
-    zIndex: 10,
-    display: "flex",
-    marginStart: -10,
-    justifyContent: "center",
-  },
+
   menuIconRight: {
     width: 20,
     height: 20,
-    position: "absolute",
-    right: 10,
     zIndex: 10,
   },
   buscadorDireccion: {
     flex: 1,
     borderColor: "#000",
-    borderWidth: 1,
     textAlign: "center",
-    borderRadius: 10,
-    paddingHorizontal: 40,
-    paddingVertical: 8,
-    backgroundColor: "#fff",
+    height: 50,
   },
   locationContainer: {
     marginTop: 56,
@@ -493,7 +428,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 2,
     padding: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#00120B",
+    color: "white",
     width: "70%",
     padding: 10,
     borderTopRightRadius: 10,

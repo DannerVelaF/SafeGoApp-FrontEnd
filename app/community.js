@@ -110,14 +110,20 @@ export default function Community() {
       // Primero consulta la comunidad
       const comunidad = await api.consultarComunidad(token);
       // Luego consulta el total de usuarios para la comunidad específica
-      const usuarios = await api.consultarTotalUsuarios(comunidad[0].id, token);
-      // Agrega la cantidad de usuarios al objeto de comunidad
-      const comunidadConUsuarios = comunidad.map((com) => ({
-        ...com,
-        totalUsuarios: usuarios.length,
-      }));
+      const comunidadesConUsuarios = await Promise.all(
+        comunidad.map(async (comunidad) => {
+          const usuarios = await api.consultarTotalUsuarios(
+            comunidad.id,
+            token
+          );
+          return {
+            ...comunidad,
+            totalUsuarios: usuarios.length,
+          };
+        })
+      );
 
-      setData(comunidadConUsuarios);
+      setData(comunidadesConUsuarios);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
     }

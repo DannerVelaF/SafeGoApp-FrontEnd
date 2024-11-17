@@ -75,6 +75,20 @@ const consultarComunidad = async (token) => {
   }
 };
 
+const consultarComunidadPorID = async (token, id) => {
+  try {
+    const response = await api.get(`community/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al consultar la comunidad:", error.response);
+    throw error;
+  }
+};
+
 const consultarTotalUsuarios = async (id, token) => {
   try {
     const response = await api.get(
@@ -108,6 +122,40 @@ const consultarNoticias = async (token, location) => {
   }
 };
 
+const enviarMensaje = async (token, data) => {
+  try {
+    const response = await api.post("community-messages", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al enviar mensaje:", error.response);
+    throw error;
+  }
+};
+
+const consultarMensajeComunidad = async (token, communityId) => {
+  try {
+    const response = await api.get(
+      `community-messages/community/${communityId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error al consultar mensajes de la comunidad:",
+      error.response
+    );
+    throw error;
+  }
+};
+
 // Exporta las funciones
 export default {
   registerUser,
@@ -117,4 +165,6 @@ export default {
   consultarComunidad,
   consultarTotalUsuarios,
   consultarNoticias,
+  consultarComunidadPorID,
+  enviarMensaje,
 };
