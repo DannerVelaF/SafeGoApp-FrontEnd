@@ -27,6 +27,7 @@ export default function Panel({ isOpen, togglePanel }) {
     { text: "Telefonos de emergencia ", route: "/emergency" },
     { text: "Tutorial de uso ", route: "/tutorial" },
     { text: "Noticias", route: "/news" },
+    {text: "Conoce y Aprende", route: "/learn"},
   ];
 
   const handlePress = (index, route) => {

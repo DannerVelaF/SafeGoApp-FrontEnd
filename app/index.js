@@ -32,10 +32,10 @@ export default function Index() {
         >
           <View style={styles.overlay} />
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity
+          <TouchableOpacity
               style={styles.loginButton}
               onPress={() => {
-                router.push("/home");
+                router.push("/loginScreen");
               }}
             >
               <Text style={styles.loginButtonText}>Iniciar sesión</Text>
