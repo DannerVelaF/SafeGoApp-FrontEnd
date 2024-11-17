@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
+  Image,
 } from "react-native";
 
 import { FontAwesome } from "@expo/vector-icons";
@@ -13,6 +14,8 @@ import Checkbox from "expo-checkbox";
 import api from "../service/api";
 import { useUserStore } from "../store/store";
 import { useRouter } from "expo-router"; // Importa el hook useRouter
+const backArrow = require("../assets/BackArrow.png");
+
 export default function RegisterScreen() {
   const [isChecked, setChecked] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -79,6 +82,17 @@ export default function RegisterScreen() {
     <View style={styles.container}>
       <StatusBar animated={true} backgroundColor="#00120B" barStyle="dark" />
       <View style={styles.loginBox}>
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            zIndex: 50,
+          }}
+          onPress={() => router.push("/")}
+        >
+          <Image source={backArrow} />
+        </TouchableOpacity>
         <Text style={styles.title}>Registrarse</Text>
         <Text style={styles.subtitle}>Ingresa tus datos</Text>
 
@@ -261,6 +275,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     marginBottom: 50,
+    position: "relative",
   },
   title: {
     fontSize: 24,

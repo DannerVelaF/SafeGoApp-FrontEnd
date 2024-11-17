@@ -8,13 +8,15 @@ import {
   StyleSheet,
   ImageBackground,
   StatusBar,
+  Image,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import { useRouter } from "expo-router"; // Importa el hook useRouter
 import api from "../service/api";
-import { useUserStore } from "../store/store";
-
+import { useLanguageStore, useUserStore } from "../store/store";
+import { translations } from "../util/translations";
+const backArrow = require("../assets/BackArrow.png");
 export default function LoginScreen() {
   const [isChecked, setChecked] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false); // Estado para alternar visibilidad de la contraseña
@@ -24,6 +26,7 @@ export default function LoginScreen() {
     username: "",
     password: "",
   });
+  const { languageData } = useLanguageStore();
 
   const { setUser, userData } = useUserStore();
   useEffect(() => {
@@ -58,8 +61,29 @@ export default function LoginScreen() {
       <StatusBar animated={true} backgroundColor="#00120B" barStyle="dark" />
       <View style={styles.container}>
         <View style={styles.loginBox}>
-          <Text style={styles.title}>Iniciar Sesión</Text>
-          <Text style={styles.subtitle}>Tu seguridad, nuestra prioridad </Text>
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 10,
+              left: 10,
+              zIndex: 50,
+            }}
+            onPress={() => router.push("/")}
+          >
+            <Image source={backArrow} />
+          </TouchableOpacity>
+          <Text style={styles.title}>
+            {translations[languageData].loginButtonText}
+          </Text>
+          <Text
+            style={{
+              color: "#000",
+              marginBottom: 20,
+              fontSize: 12,
+            }}
+          >
+            {translations[languageData].subtitle}
+          </Text>
 
           <View style={styles.inputGroup}>
             <FontAwesome
@@ -85,7 +109,7 @@ export default function LoginScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder={translations[languageData].password}
               secureTextEntry={!passwordVisible} // Cambia el estado según `passwordVisible`
               onChangeText={(text) =>
                 setData((prevData) => ({ ...prevData, password: text }))
@@ -109,12 +133,19 @@ export default function LoginScreen() {
                 onValueChange={setChecked}
                 tintColors={{ true: "#66bb6a", false: "#ccc" }}
               />
-              <Text style={styles.checkboxLabel}>Recordarme </Text>
+              <Text style={styles.checkboxLabel}>
+                {translations[languageData].recordarme}
+              </Text>
             </View>
             <TouchableOpacity>
-              <Text style={styles.forgotPassword}>
-                {" "}
-                ¿Olvidaste tu contraseña?{" "}
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#66bb6a",
+                  flexWrap: "wrap",
+                }}
+              >
+                {translations[languageData].forgotPassword}
               </Text>
             </TouchableOpacity>
           </View>
@@ -127,11 +158,13 @@ export default function LoginScreen() {
                 borderBottomWidth: 1,
               }}
             >
-              No estas registrado? Registrate aqui!
+              {translations[languageData].dontRegister}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Siguiente</Text>
+            <Text style={styles.buttonText}>
+              {translations[languageData].next}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -175,16 +208,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
+    position: "relative",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
   },
-  subtitle: {
-    color: "#000",
-    marginBottom: 20,
-  },
+
   inputGroup: {
     flexDirection: "row",
     alignItems: "center",

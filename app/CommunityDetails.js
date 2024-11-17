@@ -33,18 +33,16 @@ export default function CommunityDetail({ communityId, data }) {
   //   alert(JSON.stringify(data));
   const fetchData = async () => {
     try {
-      const comunidad = await api.consultarComunidad(token);
+      const comunidad = await api.consultarComunidadPorID(token, communityId);
       // Luego consulta el total de usuarios para la comunidad específica
       const usuarios = await api.consultarTotalUsuarios(communityId, token);
-      // Agrega la cantidad de usuarios al objeto de comunidad
-      const comunidadConUsuarios = comunidad.map((com) => ({
-        ...com,
+      const comunidadConUsuarios = {
+        ...comunidad,
         totalUsuarios: usuarios.length,
-      }));
-
-      setCommunity(comunidadConUsuarios[0]);
+      };
+      setCommunity(comunidadConUsuarios);
     } catch (error) {
-      alert("Error al obtener los datos:", error.mes);
+      alert("Error al obtener los datos:", error);
     }
   };
 

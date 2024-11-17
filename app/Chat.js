@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import { useRouter } from "expo-router"; // Importamos useRouter para la navegación
+import api from "../service/api";
+import { useUserStore } from "../store/store";
 
 export default function ChatScreen() {
   const [fontsLoaded] = useFonts({
@@ -26,38 +28,41 @@ export default function ChatScreen() {
     Poppins_700Bold,
   });
   const [selectedChat, setSelectedChat] = useState(null); // Estado para manejar el chat seleccionado
-
-  const [passwordVisible, setPasswordVisible] = useState(false);
   const icon = require("../assets/safegoIcon.png");
-  const menu = require("../assets/Menu.png");
   const search = require("../assets/Search.png");
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [Community, setCommunity] = useState([]);
 
-  const handleMenuClick = (e) => {
-    e.stopPropagation();
-    setPanelOpen(!panelOpen);
+  const { userData } = useUserStore();
+  const token = userData.token;
+
+  const fetchData = async () => {
+    try {
+      // Consulta todas las comunidades
+      const comunidades = await api.consultarComunidad(token);
+
+      // Itera sobre cada comunidad y consulta el total de usuarios
+      const comunidadesConUsuarios = await Promise.all(
+        comunidades.map(async (comunidad) => {
+          const usuarios = await api.consultarTotalUsuarios(
+            comunidad.id,
+            token
+          );
+          return {
+            ...comunidad,
+            totalUsuarios: usuarios.length,
+          };
+        })
+      );
+      // Actualiza el estado con los datos combinados
+      setCommunity(comunidadesConUsuarios);
+    } catch (error) {
+      alert("Error al obtener las comunidades:", error);
+    }
   };
 
-  const DATA = [
-    {
-      id: "1",
-      nombre: "San Isidro",
-      ultimoMensaje: "Buenos dias vecinos!!!",
-      activos: "120",
-      mensajes: "120",
-      miembros: "1200",
-      ultimaPersonaEnEnviarMensaje: "Maria",
-    },
-    {
-      id: "2",
-      nombre: "San Borja",
-      ultimoMensaje: "Cuidado con los robos",
-      activos: "1220",
-      mensajes: "122",
-      miembros: "1220",
-      ultimaPersonaEnEnviarMensaje: "Juan Obrero",
-    },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const Item = ({
     nombre,
@@ -76,7 +81,9 @@ export default function ChatScreen() {
       <TouchableOpacity style={styles.item} onPress={handlePress}>
         <View style={styles.members}>
           <Image source={icon} style={{ width: 50, height: 50 }} />
-          <Text>{miembros} Miembros </Text>
+          <Text>
+            {miembros} {miembros === 1 ? "Miembro" : "Miembros"}{" "}
+          </Text>
         </View>
 
         <View style={styles.joinContainer}>
@@ -145,24 +152,24 @@ export default function ChatScreen() {
           <View style={styles.search} />
         )}
       </View>
-      <Text style={{ marginTop: 10, marginBottom: 20 }}>
+      <Text style={{ marginTop: 10, marginBottom: 20, paddingHorizontal: 20 }}>
         Avisos rápidos, respuesta segura.{" "}
       </Text>
 
       {/* Condición para mostrar el Inbox o la lista de chats */}
       {selectedChat ? (
-        <Inbox chatId={selectedChat} /> // Renderiza el inbox cuando se selecciona un chat
+        <Inbox communityId={selectedChat} /> // Renderiza el inbox cuando se selecciona un chat
       ) : (
         <View style={styles.listComunity}>
           <FlatList
-            data={DATA}
+            data={Community}
             renderItem={({ item }) => (
               <Item
-                nombre={item.nombre}
+                nombre={item.name}
                 ultimoMensaje={item.ultimoMensaje}
                 activos={item.activos}
                 mensajes={item.mensajes}
-                miembros={item.miembros}
+                miembros={item.totalUsuarios}
                 ultimaPersonaEnEnviarMensaje={item.ultimaPersonaEnEnviarMensaje}
                 id={item.id}
               />

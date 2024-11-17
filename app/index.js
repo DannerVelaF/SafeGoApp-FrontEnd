@@ -6,59 +6,144 @@ import {
   StyleSheet,
   StatusBar,
   ImageBackground,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router"; // Importa el hook useRouter
-
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { useLanguageStore } from "../store/store";
+import { translations } from "../util/translations";
+const internet = require("../assets/internet.png");
 export default function Index() {
   const [isChecked, setChecked] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("Vecino");
+  const [showlang, setShowlang] = useState(false);
+  const [pressedLang, setPressedLang] = useState(null); // Estado para rastrear el idioma presionado
 
   const router = useRouter();
 
+  const { languageData, setLanguage } = useLanguageStore();
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor="#00120B"  barStyle="dark" />
+    <ImageBackground
+      style={styles.container}
+      source={require("../assets/home.png")}
+    >
+      <StatusBar backgroundColor="#00120B" barStyle="dark" />
+
       <View style={styles.loginBox}>
         <Text style={styles.title}>
           Safe<Text style={styles.go}>GO</Text>{" "}
         </Text>
-        <Text style={styles.subtitle}>Tu seguridad, nuestra prioridad! </Text>
+        <Text style={styles.subtitle}>
+          {translations[languageData].subtitle}
+        </Text>
       </View>
+
       <View style={styles.containerBottom}>
-        <ImageBackground
-          source={require("../assets/home.png")}
-          style={styles.background}
-        >
-          <View style={styles.overlay} />
-          <View style={styles.buttonsContainer}>
+        <View style={styles.overlay} />
+        <View style={styles.buttonsContainer}>
           <TouchableOpacity
-              style={styles.loginButton}
-              onPress={() => {
-                router.push("/loginScreen");
+            style={styles.loginButton}
+            onPress={() => {
+              router.push("/home");
+            }}
+          >
+            <Text style={styles.loginButtonText}>
+              {translations[languageData].loginButtonText}
+            </Text>
+          </TouchableOpacity>
+
+          {showlang && (
+            <View
+              style={{
+                backgroundColor: "white",
+                position: "absolute",
+                bottom: 100,
+                right: 20,
+                padding: 5,
+                height: 100,
+                width: 40,
+                flexDirection: "column",
+                justifyContent: "space-around",
+                alignItems: "center",
+                borderRadius: 10,
               }}
             >
-              <Text style={styles.loginButtonText}>Iniciar sesión</Text>
-            </TouchableOpacity>
-            <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>¿Aún no tienes cuenta? </Text>
               <TouchableOpacity
+                onPressIn={() => setPressedLang("es")}
+                onPressOut={() => setPressedLang(null)}
                 onPress={() => {
-                  router.push("/registerScreen");
+                  setLanguage("es");
+                  setShowlang(false);
                 }}
               >
-                <Text style={styles.registerLink}> Registrate </Text>
+                <Text
+                  style={[
+                    styles.normalText,
+                    pressedLang === "es" && styles.pressedText,
+                  ]}
+                >
+                  Es
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPressIn={() => setPressedLang("qu")}
+                onPressOut={() => setPressedLang(null)}
+                onPress={() => {
+                  setLanguage("qu");
+                  setShowlang(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.normalText,
+                    pressedLang === "qu" && styles.pressedText,
+                  ]}
+                >
+                  Qu
+                </Text>
               </TouchableOpacity>
             </View>
+          )}
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 20,
+              right: 25,
+            }}
+            onPress={() => setShowlang(!showlang)}
+          >
+            <FontAwesome5 name="globe" size={30} color="white" />
+          </TouchableOpacity>
+
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>
+              {translations[languageData].registerText}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/registerScreen");
+              }}
+            >
+              <Text style={styles.registerLink}>
+                {translations[languageData].registerLink}
+              </Text>
+            </TouchableOpacity>
           </View>
-        </ImageBackground>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  normalText: {
+    fontWeight: "bold",
+  },
 
+  pressedText: {
+    backgroundColor: "#66bb6a",
+    color: "white",
+  },
 
   subtitle: {
     fontSize: 15,
@@ -83,7 +168,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginBox: {
-    backgroundColor: "#00120B",
     width: "100%",
     height: "15%",
     padding: 20,
